@@ -21,9 +21,9 @@ Miscellaneous features:
 
 - `C` source code generator for OER and UPER (with some limitations).
 
-Project homepage: https://github.com/eerimoq/asn1tools
+Project homepage: https://github.com/boxtheta/asn1tools-ext
 
-Documentation: http://asn1tools.readthedocs.org/en/latest
+Documentation: TODO: add docs url
 
 Known limitations
 =================
@@ -47,7 +47,7 @@ Installation
 
 .. code-block:: python
 
-    pip install asn1tools
+    pip install asn1tools_ext
 
 Example Usage
 =============
@@ -101,199 +101,7 @@ The same ASN.1 specification, but using the PER codec.
 
 See the `examples`_ folder for additional examples.
 
-Command line tool
------------------
-
-The shell subcommand
-^^^^^^^^^^^^^^^^^^^^
-
-Use the command line shell to convert data between given formats. The
-default input codec is BER and output codec is GSER (produces human
-readable text).
-
-.. code-block:: text
-
-   > asn1tools shell
-
-   Welcome to the asn1tools shell!
-
-   $ help
-   Commands:
-     compile
-     convert
-     exit
-     help
-   $ compile tests/files/foo.asn
-   $ convert Question 300e0201011609497320312b313d333f
-   question Question ::= {
-       id 1,
-       question "Is 1+1=3?"
-   }
-   $ compile --output-codec xer tests/files/foo.asn
-   $ convert Question 300e0201011609497320312b313d333f
-   <Question>
-       <id>1</id>
-       <question>Is 1+1=3?</question>
-   </Question>
-   $ compile -o uper tests/files/foo.asn
-   $ convert Question 300e0201011609497320312b313d333f
-   01010993cd03156c5eb37e
-   $ exit
-   >
-
-The convert subcommand
-^^^^^^^^^^^^^^^^^^^^^^
-
-Convert given encoded Question from BER to GSER (produces human
-readable text).
-
-.. code-block:: text
-
-   > asn1tools convert tests/files/foo.asn Question 300e0201011609497320312b313d333f
-   question Question ::= {
-       id 1,
-       question "Is 1+1=3?"
-   }
-   >
-
-Convert given encoded Question from UPER to XER (xml).
-
-.. code-block:: text
-
-   > asn1tools convert -i uper -o xer tests/files/foo.asn Question 01010993cd03156c5eb37e
-   <Question>
-       <id>1</id>
-       <question>Is 1+1=3?</question>
-   </Question>
-   >
-
-Convert given encoded Question from UPER to JER (json).
-
-.. code-block:: text
-
-   > asn1tools convert -i uper -o jer tests/files/foo.asn Question 01010993cd03156c5eb37e
-   {
-       "id": 1,
-       "question": "Is 1+1=3?"
-   }
-   >
-
-Continuously convert encoded Questions read from standard input. Any
-line that cannot be converted is printed as is, in this example the
-dates.
-
-.. code-block:: text
-
-   > cat encoded.txt
-   2018-02-24 11:22:09
-   300e0201011609497320312b313d333f
-   2018-02-24 11:24:15
-   300e0201021609497320322b323d353f
-   > cat encoded.txt | asn1tools convert tests/files/foo.asn Question -
-   2018-02-24 11:22:09
-   question Question ::= {
-       id 1,
-       question "Is 1+1=3?"
-   }
-   2018-02-24 11:24:15
-   question Question ::= {
-       id 2,
-       question "Is 2+2=5?"
-   }
-   >
-
-The convert subcommand with a cache
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-Convert given encoded PCCH-Message from UPER to GSER with the
-``--cache-dir`` option set to ``my_cache``. Using a cache
-significantly reduces the command execution time after the first call.
-
-.. code-block:: text
-
-   > time asn1tools convert --cache-dir my_cache -i uper tests/files/3gpp/rrc_8_6_0.asn PCCH-Message 28
-   pcch-message PCCH-Message ::= {
-       message c1 : paging : {
-           systemInfoModification true,
-           nonCriticalExtension {
-           }
-       }
-   }
-
-   real    0m2.090s
-   user    0m1.977s
-   sys     0m0.032s
-   > time asn1tools convert --cache-dir my_cache -i uper tests/files/3gpp/rrc_8_6_0.asn PCCH-Message 28
-   pcch-message PCCH-Message ::= {
-       message c1 : paging : {
-           systemInfoModification true,
-           nonCriticalExtension {
-           }
-       }
-   }
-
-   real    0m0.276s
-   user    0m0.197s
-   sys     0m0.026s
-   >
-
-The parse subcommand
-^^^^^^^^^^^^^^^^^^^^
-
-Parse given ASN.1 specification and write it as a Python dictionary to
-given file. Use the created file to convert given encoded Question
-from BER to GSER (produces human readable text). The conversion is
-significantly faster than passing .asn-file(s) to the convert
-subcommand, especially for larger ASN.1 specifications.
-
-.. code-block:: text
-
-   > asn1tools parse tests/files/foo.asn foo.py
-   > asn1tools convert foo.py Question 300e0201011609497320312b313d333f
-   question Question ::= {
-       id 1,
-       question "Is 1+1=3?"
-   }
-   >
-
-The generate C source subcommand
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-Generate OER or UPER C source code from an ASN.1 specification.
-
-No dynamic memory is used in the generated code. To achieve this all
-types in the ASN.1 specification must have a known maximum size,
-i.e. ``INTEGER (0..7)``, ``OCTET STRING (SIZE(12))``, etc.
-
-Below is an example generating OER C source code from
-`tests/files/c_source/c_source.asn`_.
-
-.. code-block:: text
-
-   > asn1tools generate_c_source --namespace oer tests/files/c_source/c_source.asn
-   Successfully generated oer.h and oer.c.
-
-The same as above, but generate UPER C source code instead of OER.
-
-.. code-block:: text
-
-   > asn1tools generate_c_source --codec uper --namespace uper tests/files/c_source/c_source.asn
-   Successfully generated uper.h and uper.c.
-
-The same as the first example, but also generate fuzz testing C source
-code for `libFuzzer`_.
-
-.. code-block:: text
-
-   > asn1tools generate_c_source --namespace oer --generate-fuzzer tests/files/c_source/c_source.asn
-   Successfully generated oer.h and oer.c.
-   Successfully generated oer_fuzzer.c and oer_fuzzer.mk.
-
-   Run "make -f oer_fuzzer.mk" to build and run the fuzzer. Requires a
-   recent version of clang.
-
-See `oer.h`_, `oer.c`_, `uper.h`_, `uper.c`_, `oer_fuzzer.c`_ and
-`oer_fuzzer.mk`_ for the contents of the generated files.
+CLI will be redesigned and placed under another package
 
 Limitations by design:
 
