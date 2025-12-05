@@ -1,8 +1,6 @@
 #!/usr/bin/env python
 
-"""Decode an X509 certificate.
-
-"""
+"""Decode an X509 certificate."""
 
 from __future__ import print_function
 import os
@@ -11,14 +9,11 @@ import asn1tools
 
 
 SCRIPT_DIR = os.path.dirname(os.path.realpath(__file__))
-RFC5280_ASN_PATH = os.path.join(SCRIPT_DIR,
-                                '..',
-                                'tests',
-                                'files',
-                                'ietf',
-                                'rfc5280.asn')
+RFC5280_ASN_PATH = os.path.join(
+    SCRIPT_DIR, "..", "tests", "files", "ietf", "rfc5280.asn"
+)
 
-CERTIFICATE_PEM = '''\
+CERTIFICATE_PEM = """\
 -----BEGIN CERTIFICATE-----
 MIIDCjCCAfICCQCoXfSQydXTczANBgkqhkiG9w0BAQsFADBHMQswCQYDVQQGEwJT
 RTETMBEGA1UECAwKU29tZS1TdGF0ZTEOMAwGA1UECgwFU2ltYmExEzARBgNVBAMM
@@ -38,16 +33,16 @@ sxOVwvvO/m/6g68G+uZYUoCsQsKllM2fgdNLTzbYvnFtsq5QnZS8m7CoZgEy2c3m
 VrrPsfwmyhwejDawjz2epSLNXaaDeSz4g1cQes+oehaA1IwFfKhb9tdiWUm48VuU
 oaFZ8e1HofYUy+65pws=
 -----END CERTIFICATE-----\
-'''
+"""
 
 certificate = CERTIFICATE_PEM.splitlines()[1:-1]
-certificate = ''.join(certificate)
+certificate = "".join(certificate)
 certificate = base64.b64decode(certificate)
 
-rfc5280_der = asn1tools.compile_files(RFC5280_ASN_PATH, codec='der')
-rfc5280_gser = asn1tools.compile_files(RFC5280_ASN_PATH, codec='gser')
+rfc5280_der = asn1tools.compile_files(RFC5280_ASN_PATH, codec="der")
+rfc5280_gser = asn1tools.compile_files(RFC5280_ASN_PATH, codec="gser")
 
-decoded = rfc5280_der.decode('Certificate', certificate)
-encoded = rfc5280_gser.encode('Certificate', decoded, indent=4)
+decoded = rfc5280_der.decode("Certificate", certificate)
+encoded = rfc5280_gser.encode("Certificate", decoded, indent=4)
 
-print(encoded.decode('ascii'))
+print(encoded.decode("ascii"))

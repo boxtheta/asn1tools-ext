@@ -17,7 +17,7 @@ from binascii import hexlify
 import asn1tools
 
 
-SPECIFICATION = '''
+SPECIFICATION = """
 HelloWorld DEFINITIONS ::= BEGIN
 
     Message ::= SEQUENCE {
@@ -26,14 +26,14 @@ HelloWorld DEFINITIONS ::= BEGIN
     }
 
 END
-'''
+"""
 
-hello_world = asn1tools.compile_string(SPECIFICATION, 'uper')
+hello_world = asn1tools.compile_string(SPECIFICATION, "uper")
 
-message = {'number': 2, 'text': u'Hi!'}
-encoded = hello_world.encode('Message', message)
-decoded = hello_world.decode('Message', encoded)
+message = {"number": 2, "text": "Hi!"}
+encoded = hello_world.encode("Message", message)
+decoded = hello_world.decode("Message", encoded)
 
-print('Message:', message)
-print('Encoded:', hexlify(encoded).decode('ascii'))
-print('Decoded:', decoded)
+print("Message:", message)
+print("Encoded:", hexlify(encoded).decode("ascii"))
+print("Decoded:", decoded)

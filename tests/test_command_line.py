@@ -17,38 +17,34 @@ import asn1tools
 
 
 def remove_date_time(string):
-    return re.sub(r'.* This file was generated.*', '', string)
+    return re.sub(r".* This file was generated.*", "", string)
 
 
 def read_file(filename):
-    with open(filename, 'r') as fin:
+    with open(filename, "r") as fin:
         return remove_date_time(fin.read())
 
 
 class Asn1ToolsCommandLineTest(unittest.TestCase):
-
     maxDiff = None
 
     def test_command_line_convert_ber_foo_question(self):
         argv = [
-            'asn1tools',
-            'convert',
-            'tests/files/foo.asn',
-            'Question',
-            '300e0201011609497320312b313d333f'
+            "asn1tools",
+            "convert",
+            "tests/files/foo.asn",
+            "Question",
+            "300e0201011609497320312b313d333f",
         ]
 
         expected_output = (
-            'question Question ::= {\n'
-            '    id 1,\n'
-            '    question "Is 1+1=3?"\n'
-            '}\n'
+            'question Question ::= {\n    id 1,\n    question "Is 1+1=3?"\n}\n'
         )
 
         stdout = StringIO()
 
-        with patch('sys.stdout', stdout):
-            with patch('sys.argv', argv):
+        with patch("sys.stdout", stdout):
+            with patch("sys.argv", argv):
                 asn1tools._main()
 
         print(stdout.getvalue())
@@ -57,25 +53,23 @@ class Asn1ToolsCommandLineTest(unittest.TestCase):
 
     def test_command_line_convert_uper_foo_question(self):
         argv = [
-            'asn1tools',
-            'convert',
-            '--input-codec', 'uper',
-            'tests/files/foo.asn',
-            'Question',
-            '01010993cd03156c5eb37e'
+            "asn1tools",
+            "convert",
+            "--input-codec",
+            "uper",
+            "tests/files/foo.asn",
+            "Question",
+            "01010993cd03156c5eb37e",
         ]
 
         expected_output = (
-            'question Question ::= {\n'
-            '    id 1,\n'
-            '    question "Is 1+1=3?"\n'
-            '}\n'
+            'question Question ::= {\n    id 1,\n    question "Is 1+1=3?"\n}\n'
         )
 
         stdout = StringIO()
 
-        with patch('sys.stdout', stdout):
-            with patch('sys.argv', argv):
+        with patch("sys.stdout", stdout):
+            with patch("sys.argv", argv):
                 asn1tools._main()
 
         print(stdout.getvalue())
@@ -83,14 +77,8 @@ class Asn1ToolsCommandLineTest(unittest.TestCase):
         self.assertEqual(expected_output, stdout.getvalue())
 
     def test_command_line_convert_ber_foo_question_stdin(self):
-        argv = [
-            'asn1tools',
-            'convert',
-            'tests/files/foo.asn',
-            'Question',
-            '-'
-        ]
-        input_data = '''\
+        argv = ["asn1tools", "convert", "tests/files/foo.asn", "Question", "-"]
+        input_data = """\
 2018-02-24 11:22:09
 300e0201011609497320312b313d333f
 2018-02-24 11:24:15
@@ -99,7 +87,7 @@ class Asn1ToolsCommandLineTest(unittest.TestCase):
 2018-02-24 11:24:16
 ff0e0201011609497320312b313d333f
 2018-02-24 13:24:16
-300e0201011609497320312b313d333'''
+300e0201011609497320312b313d333"""
 
         expected_output = (
             "2018-02-24 11:22:09\n"
@@ -122,9 +110,9 @@ ff0e0201011609497320312b313d333f
 
         stdout = StringIO()
 
-        with patch('sys.stdin', StringIO(input_data)):
-            with patch('sys.stdout', stdout):
-                with patch('sys.argv', argv):
+        with patch("sys.stdin", StringIO(input_data)):
+            with patch("sys.stdout", stdout):
+                with patch("sys.argv", argv):
                     asn1tools._main()
 
         print(stdout.getvalue())
@@ -133,17 +121,17 @@ ff0e0201011609497320312b313d333f
 
     def test_command_line_convert_rfc1155_1157(self):
         argv = [
-            'asn1tools',
-            'convert',
-            'tests/files/ietf/rfc1155.asn',
-            'tests/files/ietf/rfc1157.asn',
-            'Message',
-            '30819f02010004067075626c6963a3819102013c020100020100308185302206'
-            '122b06010401817d08330a0201070a86deb735040c3137322e33312e31392e37'
-            '33301706122b06010401817d08330a0201050a86deb960020102302306122b06'
-            '010401817d08330a0201070a86deb736040d3235352e3235352e3235352e3030'
-            '2106122b06010401817d08330a0201070a86deb738040b3137322e33312e3139'
-            '2e32'
+            "asn1tools",
+            "convert",
+            "tests/files/ietf/rfc1155.asn",
+            "tests/files/ietf/rfc1157.asn",
+            "Message",
+            "30819f02010004067075626c6963a3819102013c020100020100308185302206"
+            "122b06010401817d08330a0201070a86deb735040c3137322e33312e31392e37"
+            "33301706122b06010401817d08330a0201050a86deb960020102302306122b06"
+            "010401817d08330a0201070a86deb736040d3235352e3235352e3235352e3030"
+            "2106122b06010401817d08330a0201070a86deb738040b3137322e33312e3139"
+            "2e32",
         ]
 
         expected_output = (
@@ -178,8 +166,8 @@ ff0e0201011609497320312b313d333f
 
         stdout = StringIO()
 
-        with patch('sys.stdout', stdout):
-            with patch('sys.argv', argv):
+        with patch("sys.stdout", stdout):
+            with patch("sys.argv", argv):
                 asn1tools._main()
 
         print(stdout.getvalue())
@@ -188,24 +176,24 @@ ff0e0201011609497320312b313d333f
 
     def test_command_line_convert_rrc_8_6_0_bcch_dl_sch_message(self):
         argv = [
-            'asn1tools',
-            'convert',
-            'tests/files/3gpp/rrc_8_6_0.asn',
-            'BCCH-DL-SCH-Message',
-            '30820193a082018fa082018ba0820187a0820183a082017fa082017ba081'
-            'dda00f8001ffa20a80010f810105820203f0a181ada026a00e800105a109'
-            '800106810101820100a106800100810109a2098001058101048201058301'
-            '08a103800100a206800103810101a31280020344a10c8001218101008201'
-            '0a830140a4068001c4810102a51ca00c80010181010082010a830100a10c'
-            '8001ff810116820100830105a60d800100810162820104830207ffa70ba1'
-            '098001008101048201ffa81d800182810100820181a30f80010081010082'
-            '01018301008401018401ff890100a2128001008101018201018301018401'
-            '06850101a303820103850100a137a01b800100a116a00c80010381010382'
-            '0101830110a106800100810101a106810107820103a2108001df82010084'
-            '010085020680860104a200a31da01b30198001018101d383010085011f86'
-            '011d8701008801ff8a020600a403820103a503800103a60ba30981070601'
-            '2345678900a703800134a80e8003002334810300123482023212a9138003'
-            '0067888103005435820100830113840112'
+            "asn1tools",
+            "convert",
+            "tests/files/3gpp/rrc_8_6_0.asn",
+            "BCCH-DL-SCH-Message",
+            "30820193a082018fa082018ba0820187a0820183a082017fa082017ba081"
+            "dda00f8001ffa20a80010f810105820203f0a181ada026a00e800105a109"
+            "800106810101820100a106800100810109a2098001058101048201058301"
+            "08a103800100a206800103810101a31280020344a10c8001218101008201"
+            "0a830140a4068001c4810102a51ca00c80010181010082010a830100a10c"
+            "8001ff810116820100830105a60d800100810162820104830207ffa70ba1"
+            "098001008101048201ffa81d800182810100820181a30f80010081010082"
+            "01018301008401018401ff890100a2128001008101018201018301018401"
+            "06850101a303820103850100a137a01b800100a116a00c80010381010382"
+            "0101830110a106800100810101a106810107820103a2108001df82010084"
+            "010085020680860104a200a31da01b30198001018101d383010085011f86"
+            "011d8701008801ff8a020600a403820103a503800103a60ba30981070601"
+            "2345678900a703800134a80e8003002334810300123482023212a9138003"
+            "0067888103005435820100830113840112",
         ]
 
         expected_output = (
@@ -395,8 +383,8 @@ ff0e0201011609497320312b313d333f
 
         stdout = StringIO()
 
-        with patch('sys.stdout', stdout):
-            with patch('sys.argv', argv):
+        with patch("sys.stdout", stdout):
+            with patch("sys.argv", argv):
                 asn1tools._main()
 
         print(stdout.getvalue())
@@ -406,78 +394,69 @@ ff0e0201011609497320312b313d333f
 
     def test_command_line_convert_bad_type_name(self):
         argv = [
-            'asn1tools',
-            'convert',
-            'tests/files/foo.asn',
-            'Question2',
-            '01010993cd03156c5eb37e'
+            "asn1tools",
+            "convert",
+            "tests/files/foo.asn",
+            "Question2",
+            "01010993cd03156c5eb37e",
         ]
 
         stdout = StringIO()
 
-        with patch('sys.stdout', stdout):
-            with patch('sys.argv', argv):
+        with patch("sys.stdout", stdout):
+            with patch("sys.argv", argv):
                 with self.assertRaises(SystemExit) as cm:
                     asn1tools._main()
 
                 self.assertEqual(
                     str(cm.exception),
-                    "error: Type 'Question2' not found in types dictionary.")
+                    "error: Type 'Question2' not found in types dictionary.",
+                )
 
     def test_command_line_convert_bad_data(self):
-        argv = [
-            'asn1tools',
-            'convert',
-            'tests/files/foo.asn',
-            'Question',
-            '012'
-        ]
+        argv = ["asn1tools", "convert", "tests/files/foo.asn", "Question", "012"]
 
         stdout = StringIO()
 
-        with patch('sys.stdout', stdout):
-            with patch('sys.argv', argv):
+        with patch("sys.stdout", stdout):
+            with patch("sys.argv", argv):
                 with self.assertRaises(SystemExit) as cm:
                     asn1tools._main()
 
-                self.assertEqual(str(cm.exception),
-                                 "error: '012': Odd-length string")
+                self.assertEqual(str(cm.exception), "error: '012': Odd-length string")
 
     def test_command_line_convert_py(self):
         # Preparations.
         argv = [
-            'asn1tools',
-            'parse',
-            'tests/files/foo.asn',
-            'test_command_line_convert_py.py'
+            "asn1tools",
+            "parse",
+            "tests/files/foo.asn",
+            "test_command_line_convert_py.py",
         ]
 
-        if os.path.exists('test_command_line_convert_py.py'):
-            os.remove('test_command_line_convert_py.py')
+        if os.path.exists("test_command_line_convert_py.py"):
+            os.remove("test_command_line_convert_py.py")
 
-        with patch('sys.argv', argv):
+        with patch("sys.argv", argv):
             asn1tools._main()
 
         # Test convert.
         argv = [
-            'asn1tools',
-            'convert',
-            'test_command_line_convert_py.py',
-            'Question',
-            '300e0201011609497320312b313d333f'
+            "asn1tools",
+            "convert",
+            "test_command_line_convert_py.py",
+            "Question",
+            "300e0201011609497320312b313d333f",
         ]
 
         expected_output = (
-            'question Question ::= {\n'
-            '    id 1,\n'
-            '    question "Is 1+1=3?"\n'
-            '}\n'
+            'question Question ::= {\n    id 1,\n    question "Is 1+1=3?"\n}\n'
         )
 
         stdout = StringIO()
 
-        with patch('sys.stdout', stdout):
-            with patch('sys.argv', argv):
+        with patch("sys.stdout", stdout):
+            with patch("sys.argv", argv):
                 asn1tools._main()
 
         print(stdout.getvalue())
@@ -486,28 +465,28 @@ ff0e0201011609497320312b313d333f
 
     def test_command_line_convert_py_too_many_files(self):
         argv = [
-            'asn1tools',
-            'convert',
-            'spec.py',
-            'too-many.py',
-            'Question',
-            '300e0201011609497320312b313d333f'
+            "asn1tools",
+            "convert",
+            "spec.py",
+            "too-many.py",
+            "Question",
+            "300e0201011609497320312b313d333f",
         ]
 
         stdout = StringIO()
 
-        with patch('sys.stdout', stdout):
-            with patch('sys.argv', argv):
+        with patch("sys.stdout", stdout):
+            with patch("sys.argv", argv):
                 with self.assertRaises(SystemExit) as cm:
                     asn1tools._main()
 
                 self.assertEqual(
-                    str(cm.exception),
-                    "error: Expected one .py-file, but got 2.")
+                    str(cm.exception), "error: Expected one .py-file, but got 2."
+                )
 
     def test_command_line_shell(self):
-        argv = ['asn1tools', 'shell']
-        commands = StringIO('''\
+        argv = ["asn1tools", "shell"]
+        commands = StringIO("""\
 help
 compile tests/files/foo.asn
 convert Question 300e0201011609497320312b313d333f
@@ -517,10 +496,9 @@ convert Question 01010993cd03156c5eb37e
 compile -i ber /x/y/missing
 missing-command
 exit
-''')
+""")
 
         class PromptSession(object):
-
             def __init__(self, *_args, **_kwargs):
                 pass
 
@@ -528,32 +506,32 @@ exit
                 return commands.readline()
 
         expected_output = (
-            '\n'
-            'Welcome to the asn1tools shell!\n'
-            '\n'
+            "\n"
+            "Welcome to the asn1tools shell!\n"
+            "\n"
             "Commands:\n"
             "  compile\n"
             "  convert\n"
             "  exit\n"
             "  help\n"
-            'question Question ::= {\n'
-            '    id 1,\n'
+            "question Question ::= {\n"
+            "    id 1,\n"
             '    question "Is 1+1=3?"\n'
-            '}\n'
-            'error: Type \'Foo\' not found in types dictionary.\n'
-            'question Question ::= {\n'
-            '    id 1,\n'
+            "}\n"
+            "error: Type 'Foo' not found in types dictionary.\n"
+            "question Question ::= {\n"
+            "    id 1,\n"
             '    question "Is 1+1=3?"\n'
-            '}\n'
-            'error: [Errno 2] No such file or directory: \'/x/y/missing\'\n'
-            'missing-command: command not found\n'
+            "}\n"
+            "error: [Errno 2] No such file or directory: '/x/y/missing'\n"
+            "missing-command: command not found\n"
         )
 
         stdout = StringIO()
 
-        with patch('asn1tools.PromptSession', PromptSession):
-            with patch('sys.stdout', stdout):
-                with patch('sys.argv', argv):
+        with patch("asn1tools.PromptSession", PromptSession):
+            with patch("sys.stdout", stdout):
+                with patch("sys.argv", argv):
                     asn1tools._main()
 
         print(stdout.getvalue())
@@ -561,14 +539,13 @@ exit
         self.assertEqual(expected_output, stdout.getvalue())
 
     def test_command_line_shell_compile_without_arguments(self):
-        argv = ['asn1tools', 'shell']
-        commands = StringIO('''\
+        argv = ["asn1tools", "shell"]
+        commands = StringIO("""\
 compile
 exit
-''')
+""")
 
         class PromptSession(object):
-
             def __init__(self, *_args, **_kwargs):
                 pass
 
@@ -577,30 +554,29 @@ exit
 
         stdout = StringIO()
 
-        with patch('asn1tools.PromptSession', PromptSession):
-            with patch('sys.stdout', stdout):
-                with patch('sys.argv', argv):
+        with patch("asn1tools.PromptSession", PromptSession):
+            with patch("sys.stdout", stdout):
+                with patch("sys.argv", argv):
                     asn1tools._main()
 
-        self.assertIn('compile: error: ', stdout.getvalue())
+        self.assertIn("compile: error: ", stdout.getvalue())
 
     def test_command_line_shell_convert_without_compile(self):
-        argv = ['asn1tools', 'shell']
-        commands = StringIO('''\
+        argv = ["asn1tools", "shell"]
+        commands = StringIO("""\
 convert A 00
 exit
-''')
+""")
 
         expected_output = (
-            '\n'
-            'Welcome to the asn1tools shell!\n'
-            '\n'
+            "\n"
+            "Welcome to the asn1tools shell!\n"
+            "\n"
             "No compiled specification found. Please use the 'compile' command "
             "to compile one.\n"
         )
 
         class PromptSession(object):
-
             def __init__(self, *_args, **_kwargs):
                 pass
 
@@ -609,22 +585,21 @@ exit
 
         stdout = StringIO()
 
-        with patch('asn1tools.PromptSession', PromptSession):
-            with patch('sys.stdout', stdout):
-                with patch('sys.argv', argv):
+        with patch("asn1tools.PromptSession", PromptSession):
+            with patch("sys.stdout", stdout):
+                with patch("sys.argv", argv):
                     asn1tools._main()
 
         self.assertEqual(expected_output, stdout.getvalue())
 
     def test_command_line_shell_compile_help_no_exit(self):
-        argv = ['asn1tools', 'shell']
-        commands = StringIO('''\
+        argv = ["asn1tools", "shell"]
+        commands = StringIO("""\
 compile --help
 exit
-''')
+""")
 
         class PromptSession(object):
-
             def __init__(self, *_args, **_kwargs):
                 pass
 
@@ -633,42 +608,51 @@ exit
 
         stdout = StringIO()
 
-        with patch('asn1tools.PromptSession', PromptSession):
-            with patch('sys.stdout', stdout):
-                with patch('sys.argv', argv):
+        with patch("asn1tools.PromptSession", PromptSession):
+            with patch("sys.stdout", stdout):
+                with patch("sys.argv", argv):
                     asn1tools._main()
 
-        self.assertIn('usage:', stdout.getvalue())
+        self.assertIn("usage:", stdout.getvalue())
 
     def test_command_line_parse(self):
         argv = [
-            'asn1tools',
-            'parse',
-            'tests/files/foo.asn',
-            'test_command_line_parse.py'
+            "asn1tools",
+            "parse",
+            "tests/files/foo.asn",
+            "test_command_line_parse.py",
         ]
 
         expected_specification = {
-            'Foo': {'extensibility-implied': False,
-                    'imports': {},
-                    'object-classes': {},
-                    'object-sets': {},
-                    'types': {'Answer': {'members': [{'name': 'id',
-                                                      'type': 'INTEGER'},
-                                                     {'name': 'answer',
-                                                      'type': 'BOOLEAN'}],
-                                         'type': 'SEQUENCE'},
-                              'Question': {'members': [{'name': 'id',
-                                                        'type': 'INTEGER'},
-                                                       {'name': 'question',
-                                                        'type': 'IA5String'}],
-                                           'type': 'SEQUENCE'}},
-                    'values': {}}}
+            "Foo": {
+                "extensibility-implied": False,
+                "imports": {},
+                "object-classes": {},
+                "object-sets": {},
+                "types": {
+                    "Answer": {
+                        "members": [
+                            {"name": "id", "type": "INTEGER"},
+                            {"name": "answer", "type": "BOOLEAN"},
+                        ],
+                        "type": "SEQUENCE",
+                    },
+                    "Question": {
+                        "members": [
+                            {"name": "id", "type": "INTEGER"},
+                            {"name": "question", "type": "IA5String"},
+                        ],
+                        "type": "SEQUENCE",
+                    },
+                },
+                "values": {},
+            }
+        }
 
-        if os.path.exists('test_command_line_parse.py'):
-            os.remove('test_command_line_parse.py')
+        if os.path.exists("test_command_line_parse.py"):
+            os.remove("test_command_line_parse.py")
 
-        with patch('sys.argv', argv):
+        with patch("sys.argv", argv):
             asn1tools._main()
 
         from test_command_line_parse import SPECIFICATION
@@ -677,18 +661,20 @@ exit
 
     def test_command_line_generate_c_source_oer(self):
         argv = [
-            'asn1tools', '--debug',
-            'generate_c_source',
-            '--namespace', 'oer',
-            '--generate-fuzzer',
-            'tests/files/c_source/c_source.asn',
-            'tests/files/c_source/programming_types.asn'
+            "asn1tools",
+            "--debug",
+            "generate_c_source",
+            "--namespace",
+            "oer",
+            "--generate-fuzzer",
+            "tests/files/c_source/c_source.asn",
+            "tests/files/c_source/programming_types.asn",
         ]
 
-        filename_h = 'oer.h'
-        filename_c = 'oer.c'
-        fuzzer_filename_c = 'oer_fuzzer.c'
-        fuzzer_filename_mk = 'oer_fuzzer.mk'
+        filename_h = "oer.h"
+        filename_c = "oer.c"
+        fuzzer_filename_c = "oer_fuzzer.c"
+        fuzzer_filename_mk = "oer_fuzzer.mk"
 
         if os.path.exists(filename_h):
             os.remove(filename_h)
@@ -702,33 +688,35 @@ exit
         if os.path.exists(fuzzer_filename_mk):
             os.remove(fuzzer_filename_mk)
 
-        with patch('sys.argv', argv):
+        with patch("sys.argv", argv):
             asn1tools._main()
 
         self.assertEqual(
-            read_file('tests/files/c_source/' + filename_h),
-            read_file(filename_h))
+            read_file("tests/files/c_source/" + filename_h), read_file(filename_h)
+        )
         self.assertEqual(
-            read_file('tests/files/c_source/' + filename_c),
-            read_file(filename_c))
+            read_file("tests/files/c_source/" + filename_c), read_file(filename_c)
+        )
         self.assertEqual(
-            read_file('tests/files/c_source/' + fuzzer_filename_c),
-            read_file(fuzzer_filename_c))
+            read_file("tests/files/c_source/" + fuzzer_filename_c),
+            read_file(fuzzer_filename_c),
+        )
         self.assertEqual(
-            read_file('tests/files/c_source/' + fuzzer_filename_mk),
-            read_file(fuzzer_filename_mk))
+            read_file("tests/files/c_source/" + fuzzer_filename_mk),
+            read_file(fuzzer_filename_mk),
+        )
 
     def test_command_line_generate_c_source_oer_minus(self):
         argv = [
-            'asn1tools',
-            'generate_c_source',
-            'tests/files/c_source/c_source-minus.asn'
+            "asn1tools",
+            "generate_c_source",
+            "tests/files/c_source/c_source-minus.asn",
         ]
 
-        filename_h = 'c_source-minus.h'
-        filename_c = 'c_source-minus.c'
-        fuzzer_filename_c = 'c_source-minus_fuzzer.c'
-        fuzzer_filename_mk = 'c_source-minus_fuzzer.mk'
+        filename_h = "c_source-minus.h"
+        filename_c = "c_source-minus.c"
+        fuzzer_filename_c = "c_source-minus_fuzzer.c"
+        fuzzer_filename_mk = "c_source-minus_fuzzer.mk"
 
         if os.path.exists(filename_h):
             os.remove(filename_h)
@@ -742,32 +730,34 @@ exit
         if os.path.exists(fuzzer_filename_mk):
             os.remove(fuzzer_filename_mk)
 
-        with patch('sys.argv', argv):
+        with patch("sys.argv", argv):
             asn1tools._main()
 
         self.assertEqual(
-            read_file('tests/files/c_source/' + filename_h),
-            read_file(filename_h))
+            read_file("tests/files/c_source/" + filename_h), read_file(filename_h)
+        )
         self.assertEqual(
-            read_file('tests/files/c_source/' + filename_c),
-            read_file(filename_c))
+            read_file("tests/files/c_source/" + filename_c), read_file(filename_c)
+        )
         self.assertFalse(os.path.exists(fuzzer_filename_c))
         self.assertFalse(os.path.exists(fuzzer_filename_mk))
 
     def test_command_line_generate_c_source_uper(self):
         argv = [
-            'asn1tools',
-            'generate_c_source',
-            '--namespace', 'uper',
-            '--codec', 'uper',
-            '--generate-fuzzer',
-            'tests/files/c_source/c_source.asn'
+            "asn1tools",
+            "generate_c_source",
+            "--namespace",
+            "uper",
+            "--codec",
+            "uper",
+            "--generate-fuzzer",
+            "tests/files/c_source/c_source.asn",
         ]
 
-        filename_h = 'uper.h'
-        filename_c = 'uper.c'
-        fuzzer_filename_c = 'uper_fuzzer.c'
-        fuzzer_filename_mk = 'uper_fuzzer.mk'
+        filename_h = "uper.h"
+        filename_c = "uper.c"
+        fuzzer_filename_c = "uper_fuzzer.c"
+        fuzzer_filename_mk = "uper_fuzzer.mk"
 
         if os.path.exists(filename_h):
             os.remove(filename_h)
@@ -781,39 +771,40 @@ exit
         if os.path.exists(fuzzer_filename_mk):
             os.remove(fuzzer_filename_mk)
 
-        with patch('sys.argv', argv):
+        with patch("sys.argv", argv):
             asn1tools._main()
 
         self.assertEqual(
-            read_file('tests/files/c_source/' + filename_h),
-            read_file(filename_h))
+            read_file("tests/files/c_source/" + filename_h), read_file(filename_h)
+        )
         self.assertEqual(
-            read_file('tests/files/c_source/' + filename_c),
-            read_file(filename_c))
+            read_file("tests/files/c_source/" + filename_c), read_file(filename_c)
+        )
         self.assertEqual(
-            read_file('tests/files/c_source/' + fuzzer_filename_c),
-            read_file(fuzzer_filename_c))
+            read_file("tests/files/c_source/" + fuzzer_filename_c),
+            read_file(fuzzer_filename_c),
+        )
         self.assertEqual(
-            read_file('tests/files/c_source/' + fuzzer_filename_mk),
-            read_file(fuzzer_filename_mk))
+            read_file("tests/files/c_source/" + fuzzer_filename_mk),
+            read_file(fuzzer_filename_mk),
+        )
 
     def test_command_line_generate_c_source(self):
-        specs = [
-            'boolean',
-            'octet_string'
-        ]
+        specs = ["boolean", "octet_string"]
 
         for spec in specs:
             argv = [
-                'asn1tools',
-                'generate_c_source',
-                '--namespace', '{}_uper'.format(spec),
-                '--codec', 'uper',
-                'tests/files/c_source/{}.asn'.format(spec)
+                "asn1tools",
+                "generate_c_source",
+                "--namespace",
+                "{}_uper".format(spec),
+                "--codec",
+                "uper",
+                "tests/files/c_source/{}.asn".format(spec),
             ]
 
-            filename_h = spec + '_uper.h'
-            filename_c = spec + '_uper.c'
+            filename_h = spec + "_uper.h"
+            filename_c = spec + "_uper.c"
 
             if os.path.exists(filename_h):
                 os.remove(filename_h)
@@ -821,35 +812,35 @@ exit
             if os.path.exists(filename_c):
                 os.remove(filename_c)
 
-            with patch('sys.argv', argv):
+            with patch("sys.argv", argv):
                 asn1tools._main()
 
             self.assertEqual(
-                read_file('tests/files/c_source/' + filename_h),
-                read_file(filename_h))
+                read_file("tests/files/c_source/" + filename_h), read_file(filename_h)
+            )
             self.assertEqual(
-                read_file('tests/files/c_source/' + filename_c),
-                read_file(filename_c))
+                read_file("tests/files/c_source/" + filename_c), read_file(filename_c)
+            )
 
     def test_command_line_generate_rust_source_uper(self):
         argv = [
-            'asn1tools',
-            'generate_rust_source',
-            'tests/files/rust_source/rust_source.asn'
+            "asn1tools",
+            "generate_rust_source",
+            "tests/files/rust_source/rust_source.asn",
         ]
 
-        filename_rs = 'rust_source.rs'
+        filename_rs = "rust_source.rs"
 
         if os.path.exists(filename_rs):
             os.remove(filename_rs)
 
-        with patch('sys.argv', argv):
+        with patch("sys.argv", argv):
             asn1tools._main()
 
         self.assertEqual(
-            read_file('tests/files/rust_source/' + filename_rs),
-            read_file(filename_rs))
+            read_file("tests/files/rust_source/" + filename_rs), read_file(filename_rs)
+        )
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

@@ -35,39 +35,35 @@ from humanfriendly import format_size
 
 
 SCRIPT_DIR = os.path.dirname(os.path.realpath(__file__))
-RRC_8_6_0_ASN_PATH = os.path.realpath(os.path.join(SCRIPT_DIR,
-                                                   '..',
-                                                   '..',
-                                                   'tests',
-                                                   'files',
-                                                   '3gpp',
-                                                   'rrc_8_6_0.asn'))
+RRC_8_6_0_ASN_PATH = os.path.realpath(
+    os.path.join(SCRIPT_DIR, "..", "..", "tests", "files", "3gpp", "rrc_8_6_0.asn")
+)
 ITERATIONS = 1
-CACHE_DIR = os.path.join(SCRIPT_DIR, 'compile_methods_cache')
+CACHE_DIR = os.path.join(SCRIPT_DIR, "compile_methods_cache")
 
 
 def method_compile_file():
-    print("Parsing and compiling '{}' from file... ".format(RRC_8_6_0_ASN_PATH),
-          end='',
-          flush=True)
+    print(
+        "Parsing and compiling '{}' from file... ".format(RRC_8_6_0_ASN_PATH),
+        end="",
+        flush=True,
+    )
 
     def compile_file():
         asn1tools.compile_files(RRC_8_6_0_ASN_PATH)
 
     time = timeit.timeit(compile_file, number=ITERATIONS)
 
-    print('done.')
+    print("done.")
 
-    with open(RRC_8_6_0_ASN_PATH, 'rb') as fin:
+    with open(RRC_8_6_0_ASN_PATH, "rb") as fin:
         string = fin.read()
 
     return round(time, 5), len(string)
 
 
 def method_compile_cached_file():
-    print("Using cached compilation... ",
-          end='',
-          flush=True)
+    print("Using cached compilation... ", end="", flush=True)
 
     asn1tools.compile_files(RRC_8_6_0_ASN_PATH, cache_dir=CACHE_DIR)
 
@@ -76,7 +72,7 @@ def method_compile_cached_file():
 
     time = timeit.timeit(compile_file, number=ITERATIONS)
 
-    print('done.')
+    print("done.")
 
     def dir_size(path):
         total = 0
@@ -93,19 +89,19 @@ def method_compile_cached_file():
 
 
 def method_compile_string():
-    with open(RRC_8_6_0_ASN_PATH, 'r') as fin:
+    with open(RRC_8_6_0_ASN_PATH, "r") as fin:
         string = fin.read()
 
-    print("Parsing and compiling '{}'... ".format(RRC_8_6_0_ASN_PATH),
-          end='',
-          flush=True)
+    print(
+        "Parsing and compiling '{}'... ".format(RRC_8_6_0_ASN_PATH), end="", flush=True
+    )
 
     def compile_string():
         asn1tools.compile_string(string)
 
     time = timeit.timeit(compile_string, number=ITERATIONS)
 
-    print('done.')
+    print("done.")
 
     return round(time, 5), len(string)
 
@@ -113,16 +109,14 @@ def method_compile_string():
 def method_compile_dict():
     dictionary = asn1tools.parse_files(RRC_8_6_0_ASN_PATH)
 
-    print("Compiling RRC_8_6_0 dictionary... ",
-          end='',
-          flush=True)
+    print("Compiling RRC_8_6_0 dictionary... ", end="", flush=True)
 
     def compile_dict():
         asn1tools.compile_dict(dictionary)
 
     time = timeit.timeit(compile_dict, number=ITERATIONS)
 
-    print('done.')
+    print("done.")
 
     return round(time, 5), len(str(dictionary))
 
@@ -130,16 +124,14 @@ def method_compile_dict():
 def method_unpickle():
     pickled = pickle.dumps(asn1tools.compile_files(RRC_8_6_0_ASN_PATH))
 
-    print("Unpickling compiled object... ",
-          end='',
-          flush=True)
+    print("Unpickling compiled object... ", end="", flush=True)
 
     def unpickle():
         pickle.loads(pickled)
 
     time = timeit.timeit(unpickle, number=ITERATIONS)
 
-    print('done.')
+    print("done.")
 
     return round(time, 5), len(pickled)
 
@@ -147,9 +139,9 @@ def method_unpickle():
 print()
 
 if os.path.exists(CACHE_DIR):
-    print('Removing {}... '.format(CACHE_DIR), end='', flush=True)
+    print("Removing {}... ".format(CACHE_DIR), end="", flush=True)
     shutil.rmtree(CACHE_DIR)
-    print('done.')
+    print("done.")
 
 compile_file_stats = method_compile_file()
 compile_cached_file_stats = method_compile_cached_file()
@@ -159,19 +151,17 @@ unpickle_stats = method_unpickle()
 
 # Comparison output.
 measurements = [
-    ('compile-file', *compile_file_stats),
-    ('compile-cached-file', *compile_cached_file_stats),
-    ('compile-string', *compile_string_stats),
-    ('compile-dict', *compile_dict_stats),
-    ('unpickle', *unpickle_stats)
+    ("compile-file", *compile_file_stats),
+    ("compile-cached-file", *compile_cached_file_stats),
+    ("compile-string", *compile_string_stats),
+    ("compile-dict", *compile_dict_stats),
+    ("unpickle", *unpickle_stats),
 ]
 
 measurements = sorted(measurements, key=lambda m: m[1])
 
 print()
-print('METHOD                    TIME  STORAGE-SIZE')
+print("METHOD                    TIME  STORAGE-SIZE")
 
 for name, execution_time, size in measurements:
-    print('{:20} {:>9} {:>13}'.format(name,
-                                      execution_time,
-                                      format_size(size)))
+    print("{:20} {:>9} {:>13}".format(name, execution_time, format_size(size)))
