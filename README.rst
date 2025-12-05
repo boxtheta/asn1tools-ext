@@ -21,6 +21,12 @@ Miscellaneous features:
 
 - `C` source code generator for OER and UPER (with some limitations).
 
+TODOs:
+=======
+
+- Improve the `C` generator and add other supported languages and preferably
+a plugin system to allow for easy addition of target languages.
+
 Project homepage: https://github.com/boxtheta/asn1tools-ext
 
 Documentation: TODO: add docs url
