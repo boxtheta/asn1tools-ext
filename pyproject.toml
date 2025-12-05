@@ -1,8 +1,8 @@
 [project]
-name = "asn1tools-ext"
+name = "asn1tools_ext"
 version = "0.2.0"
 description = "ASN.1 parser, compiler and general swiss army knife"
-readme = "README.md"
+readme = "README.rst"
 authors = [
     { name = "xadaemon", email = "mxavier@ccho.eu" }
 ]
