@@ -1,7 +1,3 @@
-|coverage|_
-|codecov|_
-|nala|_
-
 About
 =====
 
