@@ -1,35 +1,46 @@
 """Aligned Packed Encoding Rules (PER) codec."""
 
-from operator import attrgetter
-from operator import itemgetter
 import binascii
-import string
 import datetime
+import string
+from operator import attrgetter, itemgetter
+
+from asn1tools_ext.codecs.codec import Codec
 
 from ..parser import EXTENSION_MARKER
-from . import BaseType, format_bytes, ErrorWithLocation
-from . import EncodeError
-from . import DecodeError
-from . import OutOfDataError
-from . import compiler
-from . import format_or
-from . import restricted_utc_time_to_datetime
-from . import restricted_utc_time_from_datetime
-from . import restricted_generalized_time_to_datetime
-from . import restricted_generalized_time_from_datetime
-from .compiler import enum_values_split
-from .compiler import enum_values_as_dict
-from .compiler import clean_bit_string_value
-from .compiler import rstrip_bit_string_zeros
-from .ber import encode_real
-from .ber import decode_real
-from .ber import encode_object_identifier
-from .ber import decode_object_identifier
-from .permitted_alphabet import NUMERIC_STRING
-from .permitted_alphabet import PRINTABLE_STRING
-from .permitted_alphabet import IA5_STRING
-from .permitted_alphabet import BMP_STRING
-from .permitted_alphabet import VISIBLE_STRING
+from . import (
+    BaseType,
+    DecodeError,
+    EncodeError,
+    ErrorWithLocation,
+    OutOfDataError,
+    compiler,
+    format_bytes,
+    format_or,
+    restricted_generalized_time_from_datetime,
+    restricted_generalized_time_to_datetime,
+    restricted_utc_time_from_datetime,
+    restricted_utc_time_to_datetime,
+)
+from .ber import (
+    decode_object_identifier,
+    decode_real,
+    encode_object_identifier,
+    encode_real,
+)
+from .compiler import (
+    clean_bit_string_value,
+    enum_values_as_dict,
+    enum_values_split,
+    rstrip_bit_string_zeros,
+)
+from .permitted_alphabet import (
+    BMP_STRING,
+    IA5_STRING,
+    NUMERIC_STRING,
+    PRINTABLE_STRING,
+    VISIBLE_STRING,
+)
 
 
 def is_unbound(minimum, maximum):
@@ -2066,8 +2077,10 @@ class Compiler(compiler.Compiler):
         return PermittedAlphabet(encode_map, decode_map)
 
 
-def compile_dict(specification, numeric_enums=False):
-    return Compiler(specification, numeric_enums).process()
+class PERCodec(Codec):
+    @staticmethod
+    def compile_dict(specification, numeric_enums=False):
+        return Compiler(specification, numeric_enums).process()
 
 
 def decode_full_length(_data):

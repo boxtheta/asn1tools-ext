@@ -1,21 +1,27 @@
 """XML Encoding Rules (XER) codec."""
 
-import time
-import sys
-from xml.etree import ElementTree
 import binascii
 import datetime
+import sys
+import time
+from xml.etree import ElementTree
+
+from asn1tools_ext.codecs.codec import Codec
 
 from ..parser import EXTENSION_MARKER
-from . import BaseType, format_bytes, ErrorWithLocation
-from . import EncodeError
-from . import DecodeError
-from . import compiler
-from . import format_or
-from . import utc_time_to_datetime
-from . import utc_time_from_datetime
-from . import generalized_time_to_datetime
-from . import generalized_time_from_datetime
+from . import (
+    BaseType,
+    DecodeError,
+    EncodeError,
+    ErrorWithLocation,
+    compiler,
+    format_bytes,
+    format_or,
+    generalized_time_from_datetime,
+    generalized_time_to_datetime,
+    utc_time_from_datetime,
+    utc_time_to_datetime,
+)
 from .compiler import enum_values_as_dict
 
 
@@ -755,8 +761,10 @@ class Compiler(compiler.Compiler):
         return compiled
 
 
-def compile_dict(specification, numeric_enums):
-    return Compiler(specification, numeric_enums).process()
+class XERCodec(Codec):
+    @staticmethod
+    def compile_dict(specification, numeric_enums: bool = False):
+        return Compiler(specification, numeric_enums).process()
 
 
 def decode_full_length(_data):

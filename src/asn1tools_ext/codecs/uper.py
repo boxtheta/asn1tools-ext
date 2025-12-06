@@ -1,36 +1,45 @@
 """Unaligned Packed Encoding Rules (UPER) codec."""
 
-from . import DecodeError, ErrorWithLocation
-from . import per
-from . import restricted_utc_time_to_datetime
-from . import restricted_utc_time_from_datetime
-from . import restricted_generalized_time_to_datetime
-from . import restricted_generalized_time_from_datetime
-from .per import to_int
-from .per import to_byte_array
-from .per import integer_as_number_of_bits
-from .per import PermittedAlphabet
-from .per import Type
-from .per import Boolean
-from .per import Real
-from .per import Null
-from .per import Enumerated
-from .per import ObjectIdentifier
-from .per import Sequence
-from .per import Set
-from .per import UTF8String
-from .per import GeneralString
-from .per import GraphicString
-from .per import TeletexString
-from .per import UniversalString
-from .per import ObjectDescriptor
-from .per import Any
-from .per import Recursive
-from .permitted_alphabet import NUMERIC_STRING
-from .permitted_alphabet import PRINTABLE_STRING
-from .permitted_alphabet import IA5_STRING
-from .permitted_alphabet import BMP_STRING
-from .permitted_alphabet import VISIBLE_STRING
+from asn1tools_ext.codecs.codec import Codec
+
+from . import (
+    DecodeError,
+    ErrorWithLocation,
+    per,
+    restricted_generalized_time_from_datetime,
+    restricted_generalized_time_to_datetime,
+    restricted_utc_time_from_datetime,
+    restricted_utc_time_to_datetime,
+)
+from .per import (
+    Any,
+    Boolean,
+    Enumerated,
+    GeneralString,
+    GraphicString,
+    Null,
+    ObjectDescriptor,
+    ObjectIdentifier,
+    PermittedAlphabet,
+    Real,
+    Recursive,
+    Sequence,
+    Set,
+    TeletexString,
+    Type,
+    UniversalString,
+    UTF8String,
+    integer_as_number_of_bits,
+    to_byte_array,
+    to_int,
+)
+from .permitted_alphabet import (
+    BMP_STRING,
+    IA5_STRING,
+    NUMERIC_STRING,
+    PRINTABLE_STRING,
+    VISIBLE_STRING,
+)
 
 
 class Encoder(per.Encoder):
@@ -609,8 +618,10 @@ class Compiler(per.Compiler):
         return compiled
 
 
-def compile_dict(specification, numeric_enums=False):
-    return Compiler(specification, numeric_enums).process()
+class UPERCodec(Codec):
+    @staticmethod
+    def compile_dict(specification, numeric_enums=False):
+        return Compiler(specification, numeric_enums).process()
 
 
 def decode_full_length(_data):

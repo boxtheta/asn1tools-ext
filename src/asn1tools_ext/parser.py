@@ -3,6 +3,7 @@
 import logging
 import re
 import sys
+from typing import List
 
 from pyparsing import (
     Combine,
@@ -1838,7 +1839,7 @@ def parse_string(string):
     return tokens[0]
 
 
-def parse_files(filenames, encoding="utf-8"):
+def parse_files(filenames: List[str] | str, encoding="utf-8"):
     """Parse given ASN.1 specification file(s) and return a dictionary of
     its/their contents.
 

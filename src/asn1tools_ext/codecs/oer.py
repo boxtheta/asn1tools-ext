@@ -1,28 +1,31 @@
 """Basic Octet Encoding Rules (OER) codec."""
 
 import binascii
-from copy import copy
-import struct
-from operator import attrgetter
 import datetime
+import struct
+from copy import copy
+from operator import attrgetter
+
+from asn1tools_ext.codecs.codec import Codec
 
 from ..parser import EXTENSION_MARKER
-from . import BaseType, format_bytes, ErrorWithLocation
-from . import EncodeError
-from . import DecodeError
-from . import OutOfDataError
-from . import format_or
-from . import compiler
-from . import utc_time_to_datetime
-from . import utc_time_from_datetime
-from . import generalized_time_to_datetime
-from . import generalized_time_from_datetime
+from . import (
+    BaseType,
+    DecodeError,
+    EncodeError,
+    ErrorWithLocation,
+    OutOfDataError,
+    compiler,
+    der,
+    format_bytes,
+    format_or,
+    generalized_time_from_datetime,
+    generalized_time_to_datetime,
+    utc_time_from_datetime,
+    utc_time_to_datetime,
+)
+from .ber import Class, Tag, decode_object_identifier, encode_object_identifier
 from .compiler import enum_values_as_dict
-from .ber import Class
-from .ber import Tag
-from .ber import encode_object_identifier
-from .ber import decode_object_identifier
-from . import der
 
 
 def encode_tag(number, flags):
@@ -1350,8 +1353,10 @@ class Compiler(compiler.Compiler):
             additions.append(compiled_member)
 
 
-def compile_dict(specification, numeric_enums=False):
-    return Compiler(specification, numeric_enums).process()
+class OERCodec(Codec):
+    @staticmethod
+    def compile_dict(specification, numeric_enums=False):
+        return Compiler(specification, numeric_enums).process()
 
 
 def decode_full_length(_data):

@@ -1,38 +1,46 @@
 """Distinguished Encoding Rules (DER) codec."""
 
-from . import ber
-from . import restricted_utc_time_to_datetime
-from . import restricted_utc_time_from_datetime
-from . import restricted_generalized_time_to_datetime
-from . import restricted_generalized_time_from_datetime
-from .compiler import clean_bit_string_value
-from .ber import Class, DecodeTagError, StandardEncodeMixin
-from .ber import Encoding
-from .ber import Tag
-from .ber import encode_length_definite
-from .ber import decode_full_length
-from .ber import encode_signed_integer
-from .ber import Boolean
-from .ber import Real
-from .ber import Null
-from .ber import ObjectIdentifier
-from .ber import Enumerated
-from .ber import Sequence
-from .ber import Set
-from .ber import Choice
-from .ber import Any
-from .ber import AnyDefinedBy
-from .ber import Recursive
-from .ber import ObjectDescriptor
-from .ber import Date
-from .ber import TimeOfDay
-from .ber import DateTime
+from asn1tools_ext.codecs.codec import Codec
+
+from . import (
+    ber,
+    restricted_generalized_time_from_datetime,
+    restricted_generalized_time_to_datetime,
+    restricted_utc_time_from_datetime,
+    restricted_utc_time_to_datetime,
+)
 
 # These imports are not used in this module but referenced externally
-from .ber import encode_tag
-from .ber import encode_real
-from .ber import decode_length
-from .ber import decode_real
+from .ber import (
+    Any,
+    AnyDefinedBy,
+    Boolean,
+    Choice,
+    Class,
+    Date,
+    DateTime,
+    DecodeTagError,
+    Encoding,
+    Enumerated,
+    Null,
+    ObjectDescriptor,
+    ObjectIdentifier,
+    Real,
+    Recursive,
+    Sequence,
+    Set,
+    StandardEncodeMixin,
+    Tag,
+    TimeOfDay,
+    decode_full_length,
+    decode_length,
+    decode_real,
+    encode_length_definite,
+    encode_real,
+    encode_signed_integer,
+    encode_tag,
+)
+from .compiler import clean_bit_string_value
 
 
 class Type(ber.StandardDecodeMixin, ber.Type):
@@ -356,5 +364,7 @@ class Compiler(ber.Compiler):
         return compiled
 
 
-def compile_dict(specification, numeric_enums=False):
-    return Compiler(specification, numeric_enums).process()
+class DERCodec(Codec):
+    @staticmethod
+    def compile_dict(specification, numeric_enums=False):
+        return Compiler(specification, numeric_enums).process()

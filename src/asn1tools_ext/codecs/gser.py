@@ -1,18 +1,24 @@
 """General String Encoding Rules (GSER)."""
 
-import time
 import binascii
-import math
-from copy import copy
 import datetime
+import math
+import time
+from copy import copy
 
-from . import BaseType, format_bytes, ErrorWithLocation
-from . import EncodeError
-from . import DecodeError
-from . import compiler
-from . import format_or
-from . import utc_time_from_datetime
-from . import generalized_time_from_datetime
+from asn1tools_ext.codecs.codec import Codec
+
+from . import (
+    BaseType,
+    DecodeError,
+    EncodeError,
+    ErrorWithLocation,
+    compiler,
+    format_bytes,
+    format_or,
+    generalized_time_from_datetime,
+    utc_time_from_datetime,
+)
 from .compiler import enum_values_as_dict
 
 
@@ -500,8 +506,10 @@ class Compiler(compiler.Compiler):
         return compiled
 
 
-def compile_dict(specification, numeric_enums=False):
-    return Compiler(specification, numeric_enums).process()
+class GSERCodec(Codec):
+    @staticmethod
+    def compile_dict(specification, numeric_enums=False):
+        return Compiler(specification, numeric_enums).process()
 
 
 def decode_full_length(_data):

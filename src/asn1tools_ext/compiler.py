@@ -3,6 +3,11 @@ encode and decode types.
 
 """
 
+import typing
+from typing import Dict, List, Literal
+
+from asn1tools_ext.codecs.codec import Codec
+
 from .codecs import (
     ber,
     compiler,
@@ -18,6 +23,8 @@ from .codecs import (
 )
 from .errors import CompileError, DecodeError, EncodeError
 from .parser import parse_files, parse_string
+
+CodecType = Literal["ber", "der", "gser", "jer", "oer", "per", "uper", "xer"]
 
 
 class Specification(object):
@@ -223,7 +230,10 @@ def _compile_any_defined_by_choices(specification, any_defined_by_choices):
 
 
 def compile_dict(
-    specification, codec="ber", any_defined_by_choices=None, numeric_enums=False
+    specification,
+    codec: CodecType = "ber",
+    any_defined_by_choices=None,
+    numeric_enums=False,
 ):
     """Compile given ASN.1 specification dictionary and return a
     :class:`~asn1tools.compiler.Specification` object that can be used
@@ -238,35 +248,35 @@ def compile_dict(
 
     """
 
-    codecs = {
-        "ber": ber,
-        "der": der,
-        "gser": gser,
-        "jer": jer,
-        "oer": oer,
-        "per": per,
-        "uper": uper,
-        "xer": xer,
+    codecs: Dict[CodecType, typing.Type[Codec]] = {
+        "ber": ber.BERCodec,
+        "der": der.DERCodec,
+        "gser": gser.GSERCodec,
+        "jer": jer.JERCodec,
+        "oer": oer.OERCodec,
+        "per": per.PERCodec,
+        "uper": uper.UPERCodec,
+        "xer": xer.XERCodec,
     }
 
-    try:
-        codec = codecs[codec]
-    except KeyError:
+    if codec not in codecs.keys():
         raise CompileError("Unsupported codec '{}'.".format(codec))
+
+    codec_class = codecs[codec]
 
     if any_defined_by_choices:
         _compile_any_defined_by_choices(specification, any_defined_by_choices)
 
     return Specification(
-        codec.compile_dict(specification, numeric_enums),
-        codec.decode_full_length,
+        codec_class.compile_dict(specification, numeric_enums),
+        codec_class.decode_full_length,
         type_checker.compile_dict(specification, numeric_enums),
         constraints_checker.compile_dict(specification, numeric_enums),
     )
 
 
 def compile_string(
-    string, codec="ber", any_defined_by_choices=None, numeric_enums=False
+    string, codec: CodecType = "ber", any_defined_by_choices=None, numeric_enums=False
 ):
     """Compile given ASN.1 specification string and return a
     :class:`~asn1tools.compiler.Specification` object that can be used
@@ -288,8 +298,8 @@ def compile_string(
 
 
 def compile_files(
-    filenames,
-    codec="ber",
+    filenames: List[str] | str,
+    codec: CodecType = "ber",
     any_defined_by_choices=None,
     encoding="utf-8",
     numeric_enums=False,

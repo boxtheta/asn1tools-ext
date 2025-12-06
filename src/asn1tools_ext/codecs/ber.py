@@ -6,6 +6,8 @@ import math
 import time
 from copy import copy
 
+from asn1tools_ext.codecs.codec import Codec
+
 from ..parser import EXTENSION_MARKER
 from . import (
     BaseType,
@@ -1703,8 +1705,10 @@ class Compiler(compiler.Compiler):
             additions.append(compiled_member)
 
 
-def compile_dict(specification, numeric_enums=False):
-    return Compiler(specification, numeric_enums).process()
+class BERCodec(Codec):
+    @staticmethod
+    def compile_dict(specification, numeric_enums=False):
+        return Compiler(specification, numeric_enums).process()
 
 
 def decode_full_length(data):
