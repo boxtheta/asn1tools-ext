@@ -1720,7 +1720,9 @@ class EUTRA_RRC_Definitions:
     __CSFBParametersResponseCDMA2000_criticalExtensions_criticalExtensionsFuture._cont = ASN1Dict(
         []
     )
-    __CSFBParametersResponseCDMA2000_criticalExtensions_criticalExtensionsFuture._ext = None
+    __CSFBParametersResponseCDMA2000_criticalExtensions_criticalExtensionsFuture._ext = (
+        None
+    )
     _CSFBParametersResponseCDMA2000_criticalExtensions._cont = ASN1Dict(
         [
             (
@@ -1988,7 +1990,9 @@ class EUTRA_RRC_Definitions:
     __HandoverFromEUTRAPreparationRequest_criticalExtensions_criticalExtensionsFuture._cont = ASN1Dict(
         []
     )
-    __HandoverFromEUTRAPreparationRequest_criticalExtensions_criticalExtensionsFuture._ext = None
+    __HandoverFromEUTRAPreparationRequest_criticalExtensions_criticalExtensionsFuture._ext = (
+        None
+    )
     _HandoverFromEUTRAPreparationRequest_criticalExtensions._cont = ASN1Dict(
         [
             ("c1", __HandoverFromEUTRAPreparationRequest_criticalExtensions_c1),
@@ -2907,7 +2911,9 @@ class EUTRA_RRC_Definitions:
     __RRCConnectionReconfigurationComplete_criticalExtensions_criticalExtensionsFuture._cont = ASN1Dict(
         []
     )
-    __RRCConnectionReconfigurationComplete_criticalExtensions_criticalExtensionsFuture._ext = None
+    __RRCConnectionReconfigurationComplete_criticalExtensions_criticalExtensionsFuture._ext = (
+        None
+    )
     _RRCConnectionReconfigurationComplete_criticalExtensions._cont = ASN1Dict(
         [
             (
@@ -3127,7 +3133,9 @@ class EUTRA_RRC_Definitions:
     __RRCConnectionReestablishmentComplete_criticalExtensions_criticalExtensionsFuture._cont = ASN1Dict(
         []
     )
-    __RRCConnectionReestablishmentComplete_criticalExtensions_criticalExtensionsFuture._ext = None
+    __RRCConnectionReestablishmentComplete_criticalExtensions_criticalExtensionsFuture._ext = (
+        None
+    )
     _RRCConnectionReestablishmentComplete_criticalExtensions._cont = ASN1Dict(
         [
             (
@@ -3206,7 +3214,9 @@ class EUTRA_RRC_Definitions:
     __RRCConnectionReestablishmentReject_criticalExtensions_criticalExtensionsFuture._cont = ASN1Dict(
         []
     )
-    __RRCConnectionReestablishmentReject_criticalExtensions_criticalExtensionsFuture._ext = None
+    __RRCConnectionReestablishmentReject_criticalExtensions_criticalExtensionsFuture._ext = (
+        None
+    )
     _RRCConnectionReestablishmentReject_criticalExtensions._cont = ASN1Dict(
         [
             (
@@ -3277,7 +3287,9 @@ class EUTRA_RRC_Definitions:
     __RRCConnectionReestablishmentRequest_criticalExtensions_criticalExtensionsFuture._cont = ASN1Dict(
         []
     )
-    __RRCConnectionReestablishmentRequest_criticalExtensions_criticalExtensionsFuture._ext = None
+    __RRCConnectionReestablishmentRequest_criticalExtensions_criticalExtensionsFuture._ext = (
+        None
+    )
     _RRCConnectionReestablishmentRequest_criticalExtensions._cont = ASN1Dict(
         [
             (
@@ -5822,14 +5834,18 @@ class EUTRA_RRC_Definitions:
     ____SystemInformationBlockType3_cellReselectionInfoCommon_speedStateReselectionPars_q_HystSF_sf_Medium._cont = ASN1Dict(
         [("dB-6", 0), ("dB-4", 1), ("dB-2", 2), ("dB0", 3)]
     )
-    ____SystemInformationBlockType3_cellReselectionInfoCommon_speedStateReselectionPars_q_HystSF_sf_Medium._ext = None
+    ____SystemInformationBlockType3_cellReselectionInfoCommon_speedStateReselectionPars_q_HystSF_sf_Medium._ext = (
+        None
+    )
     ____SystemInformationBlockType3_cellReselectionInfoCommon_speedStateReselectionPars_q_HystSF_sf_High = ENUM(
         name="sf-High", mode=MODE_TYPE, tag=(1, TAG_CONTEXT_SPEC, TAG_IMPLICIT)
     )
     ____SystemInformationBlockType3_cellReselectionInfoCommon_speedStateReselectionPars_q_HystSF_sf_High._cont = ASN1Dict(
         [("dB-6", 0), ("dB-4", 1), ("dB-2", 2), ("dB0", 3)]
     )
-    ____SystemInformationBlockType3_cellReselectionInfoCommon_speedStateReselectionPars_q_HystSF_sf_High._ext = None
+    ____SystemInformationBlockType3_cellReselectionInfoCommon_speedStateReselectionPars_q_HystSF_sf_High._ext = (
+        None
+    )
     ___SystemInformationBlockType3_cellReselectionInfoCommon_speedStateReselectionPars_q_HystSF._cont = ASN1Dict(
         [
             (
@@ -5842,7 +5858,9 @@ class EUTRA_RRC_Definitions:
             ),
         ]
     )
-    ___SystemInformationBlockType3_cellReselectionInfoCommon_speedStateReselectionPars_q_HystSF._ext = None
+    ___SystemInformationBlockType3_cellReselectionInfoCommon_speedStateReselectionPars_q_HystSF._ext = (
+        None
+    )
     __SystemInformationBlockType3_cellReselectionInfoCommon_speedStateReselectionPars._cont = ASN1Dict(
         [
             (
@@ -5855,7 +5873,9 @@ class EUTRA_RRC_Definitions:
             ),
         ]
     )
-    __SystemInformationBlockType3_cellReselectionInfoCommon_speedStateReselectionPars._ext = None
+    __SystemInformationBlockType3_cellReselectionInfoCommon_speedStateReselectionPars._ext = (
+        None
+    )
     _SystemInformationBlockType3_cellReselectionInfoCommon._cont = ASN1Dict(
         [
             ("q-Hyst", __SystemInformationBlockType3_cellReselectionInfoCommon_q_Hyst),
@@ -8652,7 +8672,9 @@ class EUTRA_RRC_Definitions:
             ("n60", 14),
         ]
     )
-    ___RACH_ConfigCommon_preambleInfo_preamblesGroupAConfig_sizeOfRA_PreamblesGroupA._ext = None
+    ___RACH_ConfigCommon_preambleInfo_preamblesGroupAConfig_sizeOfRA_PreamblesGroupA._ext = (
+        None
+    )
     ___RACH_ConfigCommon_preambleInfo_preamblesGroupAConfig_messageSizeGroupA = ENUM(
         name="messageSizeGroupA",
         mode=MODE_TYPE,
@@ -8683,7 +8705,9 @@ class EUTRA_RRC_Definitions:
             ("dB18", 7),
         ]
     )
-    ___RACH_ConfigCommon_preambleInfo_preamblesGroupAConfig_messagePowerOffsetGroupB._ext = None
+    ___RACH_ConfigCommon_preambleInfo_preamblesGroupAConfig_messagePowerOffsetGroupB._ext = (
+        None
+    )
     __RACH_ConfigCommon_preambleInfo_preamblesGroupAConfig._cont = ASN1Dict(
         [
             (
@@ -8753,7 +8777,9 @@ class EUTRA_RRC_Definitions:
             ("dBm-90", 15),
         ]
     )
-    __RACH_ConfigCommon_powerRampingParameters_preambleInitialReceivedTargetPower._ext = None
+    __RACH_ConfigCommon_powerRampingParameters_preambleInitialReceivedTargetPower._ext = (
+        None
+    )
     _RACH_ConfigCommon_powerRampingParameters._cont = ASN1Dict(
         [
             (
@@ -16814,7 +16840,9 @@ class EUTRA_InterNodeDefinitions:
     __HandoverPreparationInformation_criticalExtensions_criticalExtensionsFuture._cont = ASN1Dict(
         []
     )
-    __HandoverPreparationInformation_criticalExtensions_criticalExtensionsFuture._ext = None
+    __HandoverPreparationInformation_criticalExtensions_criticalExtensionsFuture._ext = (
+        None
+    )
     _HandoverPreparationInformation_criticalExtensions._cont = ASN1Dict(
         [
             ("c1", __HandoverPreparationInformation_criticalExtensions_c1),
@@ -16978,7 +17006,9 @@ class EUTRA_InterNodeDefinitions:
     __UERadioAccessCapabilityInformation_criticalExtensions_criticalExtensionsFuture._cont = ASN1Dict(
         []
     )
-    __UERadioAccessCapabilityInformation_criticalExtensions_criticalExtensionsFuture._ext = None
+    __UERadioAccessCapabilityInformation_criticalExtensions_criticalExtensionsFuture._ext = (
+        None
+    )
     _UERadioAccessCapabilityInformation_criticalExtensions._cont = ASN1Dict(
         [
             ("c1", __UERadioAccessCapabilityInformation_criticalExtensions_c1),
@@ -17015,7 +17045,9 @@ class EUTRA_InterNodeDefinitions:
             typeref=ASN1RefType(("EUTRA-RRC-Definitions", "UECapabilityInformation")),
         )
     )
-    _UERadioAccessCapabilityInformation_r8_IEs_ue_RadioAccessCapabilityInfo._const_cont = __UERadioAccessCapabilityInformation_r8_IEs_ue_RadioAccessCapabilityInfo_contain
+    _UERadioAccessCapabilityInformation_r8_IEs_ue_RadioAccessCapabilityInfo._const_cont = (
+        __UERadioAccessCapabilityInformation_r8_IEs_ue_RadioAccessCapabilityInfo_contain
+    )
     _UERadioAccessCapabilityInformation_r8_IEs_nonCriticalExtension = SEQ(
         name="nonCriticalExtension",
         mode=MODE_TYPE,

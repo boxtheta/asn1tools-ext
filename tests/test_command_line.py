@@ -486,7 +486,8 @@ ff0e0201011609497320312b313d333f
 
     def test_command_line_shell(self):
         argv = ["asn1tools", "shell"]
-        commands = StringIO("""\
+        commands = StringIO(
+            """\
 help
 compile tests/files/foo.asn
 convert Question 300e0201011609497320312b313d333f
@@ -496,7 +497,8 @@ convert Question 01010993cd03156c5eb37e
 compile -i ber /x/y/missing
 missing-command
 exit
-""")
+"""
+        )
 
         class PromptSession(object):
             def __init__(self, *_args, **_kwargs):
@@ -540,10 +542,12 @@ exit
 
     def test_command_line_shell_compile_without_arguments(self):
         argv = ["asn1tools", "shell"]
-        commands = StringIO("""\
+        commands = StringIO(
+            """\
 compile
 exit
-""")
+"""
+        )
 
         class PromptSession(object):
             def __init__(self, *_args, **_kwargs):
@@ -563,10 +567,12 @@ exit
 
     def test_command_line_shell_convert_without_compile(self):
         argv = ["asn1tools", "shell"]
-        commands = StringIO("""\
+        commands = StringIO(
+            """\
 convert A 00
 exit
-""")
+"""
+        )
 
         expected_output = (
             "\n"
@@ -594,10 +600,12 @@ exit
 
     def test_command_line_shell_compile_help_no_exit(self):
         argv = ["asn1tools", "shell"]
-        commands = StringIO("""\
+        commands = StringIO(
+            """\
 compile --help
 exit
-""")
+"""
+        )
 
         class PromptSession(object):
             def __init__(self, *_args, **_kwargs):
