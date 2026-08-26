@@ -658,9 +658,9 @@ class Compiler(object):
         try:
             while True:
                 if is_object_class_type_name(type_name):
-                    type_name, module_name = self.lookup_object_class_type_name(
-                        type_name, module_name
-                    )
+                    member_type, module_name = self.lookup_object_class_type(
+                        type_name, module_name)
+                    type_name = member_type['type']
                 else:
                     type_descriptor, module_name = self.lookup_type_descriptor(
                         type_name, module_name
@@ -677,9 +677,9 @@ class Compiler(object):
         try:
             while True:
                 if is_object_class_type_name(type_name):
-                    type_name, module_name = self.lookup_object_class_type_name(
-                        type_name, module_name
-                    )
+                    member_type, module_name = self.lookup_object_class_type(
+                        type_name, module_name)
+                    type_name = member_type['type']
                 else:
                     type_descriptor, module_name = self.lookup_type_descriptor(
                         type_name, module_name
@@ -1012,14 +1012,14 @@ class Compiler(object):
             "object-classes", "object class", object_class_name, module_name
         )
 
-    def lookup_object_class_type_name(self, type_name, module_name):
+    def lookup_object_class_type(self, type_name, module_name):
         class_name, member_name = type_name.split(".")
         result = self.lookup_object_class_descriptor(class_name, module_name)
         object_class_descriptor, module_name = result
 
         for member in object_class_descriptor["members"]:
             if member["name"] == member_name:
-                return member["type"], module_name
+                return member, module_name
 
     def get_compiled_type(self, name, type_name, module_name):
         try:
@@ -1037,11 +1037,15 @@ class Compiler(object):
         self.compiled[module_name][type_name][name] = compiled
 
     def convert_object_class_type_descriptor(self, type_descriptor, module_name):
-        type_name, module_name = self.lookup_object_class_type_name(
+        member_type, module_name = self.lookup_object_class_type(
             type_descriptor["type"], module_name
         )
         type_descriptor = deepcopy(type_descriptor)
-        type_descriptor["type"] = type_name
+        type_descriptor["type"] = member_type["type"]
+        if "size" in member_type and "size" not in type_descriptor:
+            type_descriptor["size"] = member_type["size"]
+        if "from" in member_type and "from" not in type_descriptor:
+            type_descriptor["from"] = member_type["from"]
 
         return type_descriptor, module_name
 

@@ -659,10 +659,7 @@ def convert_parameterized_object_class_assignment(_s, _l, tokens):
 
     for member in tokens[3]:
         if member[0][1].islower():
-            converted_member = member[1][0]
-
-            if isinstance(converted_member, Tokens):
-                converted_member = converted_member[0]
+            converted_member = convert_type(member[1], [])
         else:
             converted_member = {"type": "OpenType"}
 
