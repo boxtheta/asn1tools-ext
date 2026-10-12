@@ -655,6 +655,11 @@ def convert_parameterized_object_assignment(_s, _l, tokens):
 
 
 def convert_parameterized_object_class_assignment(_s, _l, tokens):
+    # A reference to a parameterized object class has no member list;
+    # let another assignment alternative match it instead.
+    if tokens[2] != "CLASS":
+        raise ParseException(_s, _l, "Expected an object class definition.")
+
     members = []
 
     for member in tokens[3]:

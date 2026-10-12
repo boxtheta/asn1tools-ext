@@ -35,11 +35,6 @@ test_compile.py
 Tests the pre processing compilation step and various compilation
 errors that are codec independent.
 
-test_command_line.py
---------------------
-
-Tests the command line interface.
-
 test_constraints_checker.py
 ---------------------------
 

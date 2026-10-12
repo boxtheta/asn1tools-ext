@@ -14,7 +14,7 @@ $
 
 from __future__ import print_function
 from binascii import hexlify
-import asn1tools
+import asn1tools_ext
 
 
 SPECIFICATION = """
@@ -28,7 +28,7 @@ HelloWorld DEFINITIONS ::= BEGIN
 END
 """
 
-hello_world = asn1tools.compile_string(SPECIFICATION, "uper")
+hello_world = asn1tools_ext.compile_string(SPECIFICATION, "uper")
 
 message = {"number": 2, "text": "Hi!"}
 encoded = hello_world.encode("Message", message)

@@ -36,13 +36,13 @@ from __future__ import print_function
 
 from datetime import datetime
 import timeit
-import asn1tools
+import asn1tools_ext
 
 ITERATIONS = 3000
 
 
 def encode_decode(codec):
-    spec = asn1tools.compile_string(
+    spec = asn1tools_ext.compile_string(
         "Ber DEFINITIONS ::= BEGIN "
         "  A ::= SEQUENCE { "
         "    a BOOLEAN, "

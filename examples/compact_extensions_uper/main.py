@@ -2,7 +2,7 @@
 
 import os
 import binascii
-import asn1tools
+import asn1tools_ext
 
 
 SCRIPT_DIR = os.path.dirname(os.path.realpath(__file__))
@@ -30,9 +30,9 @@ def decode(foo, name, encoded):
 
 
 def main():
-    foo_v1 = asn1tools.compile_files(FOO_V1_ASN_PATH, "uper")
-    foo_v2 = asn1tools.compile_files(FOO_V2_ASN_PATH, "uper")
-    foo_v2_em = asn1tools.compile_files(FOO_V2_EM_ASN_PATH, "uper")
+    foo_v1 = asn1tools_ext.compile_files(FOO_V1_ASN_PATH, "uper")
+    foo_v2 = asn1tools_ext.compile_files(FOO_V2_ASN_PATH, "uper")
+    foo_v2_em = asn1tools_ext.compile_files(FOO_V2_EM_ASN_PATH, "uper")
 
     decoded_v1 = ("foo", {"a": True, "b": 55, "c": 3, "d": False, "e": "on"})
 

@@ -30,7 +30,7 @@ import shutil
 import os
 import timeit
 import pickle
-import asn1tools
+import asn1tools_ext
 from humanfriendly import format_size
 
 
@@ -50,7 +50,7 @@ def method_compile_file():
     )
 
     def compile_file():
-        asn1tools.compile_files(RRC_8_6_0_ASN_PATH)
+        asn1tools_ext.compile_files(RRC_8_6_0_ASN_PATH)
 
     time = timeit.timeit(compile_file, number=ITERATIONS)
 
@@ -65,10 +65,10 @@ def method_compile_file():
 def method_compile_cached_file():
     print("Using cached compilation... ", end="", flush=True)
 
-    asn1tools.compile_files(RRC_8_6_0_ASN_PATH, cache_dir=CACHE_DIR)
+    asn1tools_ext.compile_files(RRC_8_6_0_ASN_PATH, cache_dir=CACHE_DIR)
 
     def compile_file():
-        asn1tools.compile_files(RRC_8_6_0_ASN_PATH, cache_dir=CACHE_DIR)
+        asn1tools_ext.compile_files(RRC_8_6_0_ASN_PATH, cache_dir=CACHE_DIR)
 
     time = timeit.timeit(compile_file, number=ITERATIONS)
 
@@ -97,7 +97,7 @@ def method_compile_string():
     )
 
     def compile_string():
-        asn1tools.compile_string(string)
+        asn1tools_ext.compile_string(string)
 
     time = timeit.timeit(compile_string, number=ITERATIONS)
 
@@ -107,12 +107,12 @@ def method_compile_string():
 
 
 def method_compile_dict():
-    dictionary = asn1tools.parse_files(RRC_8_6_0_ASN_PATH)
+    dictionary = asn1tools_ext.parse_files(RRC_8_6_0_ASN_PATH)
 
     print("Compiling RRC_8_6_0 dictionary... ", end="", flush=True)
 
     def compile_dict():
-        asn1tools.compile_dict(dictionary)
+        asn1tools_ext.compile_dict(dictionary)
 
     time = timeit.timeit(compile_dict, number=ITERATIONS)
 
@@ -122,7 +122,7 @@ def method_compile_dict():
 
 
 def method_unpickle():
-    pickled = pickle.dumps(asn1tools.compile_files(RRC_8_6_0_ASN_PATH))
+    pickled = pickle.dumps(asn1tools_ext.compile_files(RRC_8_6_0_ASN_PATH))
 
     print("Unpickling compiled object... ", end="", flush=True)
 

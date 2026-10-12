@@ -4,7 +4,7 @@
 import sys
 import unittest
 import datetime
-import asn1tools.codecs.type_checker
+import asn1tools_ext.codecs.type_checker
 from copy import deepcopy
 
 sys.path.append("tests/files")
@@ -25,11 +25,11 @@ class Asn1ToolsEncodeTypeCheckerTest(unittest.TestCase):
         bad_datas,
         bad_datas_strings=None,
     ):
-        foo = asn1tools.parse_string(
+        foo = asn1tools_ext.parse_string(
             "Foo DEFINITIONS AUTOMATIC TAGS ::= BEGIN A ::= " + type_spec + " END"
         )
 
-        foo = asn1tools.codecs.type_checker.compile_dict(foo)
+        foo = asn1tools_ext.codecs.type_checker.compile_dict(foo)
 
         for data in good_datas:
             foo["Foo"]["A"].encode(data)
@@ -38,7 +38,7 @@ class Asn1ToolsEncodeTypeCheckerTest(unittest.TestCase):
             bad_datas_strings = [str(data) for data in bad_datas]
 
         for data, bad_datas_string in zip(bad_datas, bad_datas_strings):
-            with self.assertRaises(asn1tools.EncodeError) as cm:
+            with self.assertRaises(asn1tools_ext.EncodeError) as cm:
                 foo["Foo"]["A"].encode(data)
 
             self.assertEqual(
@@ -268,7 +268,7 @@ class Asn1ToolsEncodeTypeCheckerTest(unittest.TestCase):
         )
 
     def test_rrc_8_6_0(self):
-        rrc = asn1tools.codecs.type_checker.compile_dict(deepcopy(RRC_8_6_0))
+        rrc = asn1tools_ext.codecs.type_checker.compile_dict(deepcopy(RRC_8_6_0))
 
         decoded = {
             "message": (
@@ -488,7 +488,7 @@ class Asn1ToolsEncodeTypeCheckerTest(unittest.TestCase):
         # ToDo: Fix when supported.
         return
 
-        information_object = asn1tools.codecs.type_checker.compile_dict(
+        information_object = asn1tools_ext.codecs.type_checker.compile_dict(
             deepcopy(INFORMATION_OBJECT)
         )
 
@@ -509,7 +509,7 @@ class Asn1ToolsEncodeTypeCheckerTest(unittest.TestCase):
 
         # No checks of open types performed yet.
         with self.assertRaises(AssertionError):
-            with self.assertRaises(asn1tools.EncodeError) as cm:
+            with self.assertRaises(asn1tools_ext.EncodeError) as cm:
                 information_object["InformationObject"]["ItemWithConstraints"].encode(
                     decoded
                 )

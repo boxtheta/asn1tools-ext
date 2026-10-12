@@ -3,12 +3,12 @@
 
 import json
 import unittest
-import asn1tools
+import asn1tools_ext
 import sys
 import math
 from copy import deepcopy
-from asn1tools.codecs import utc_time_to_datetime as ut2dt
-from asn1tools.codecs import generalized_time_to_datetime as gt2dt
+from asn1tools_ext.codecs import utc_time_to_datetime as ut2dt
+from asn1tools_ext.codecs import generalized_time_to_datetime as gt2dt
 
 sys.path.append("tests/files")
 sys.path.append("tests/files/3gpp")
@@ -28,7 +28,7 @@ class Asn1ToolsJerTest(unittest.TestCase):
         self.assertEqual(foo.decode(type_name, encoded), decoded)
 
     def test_real(self):
-        foo = asn1tools.compile_string(
+        foo = asn1tools_ext.compile_string(
             "Foo DEFINITIONS ::= BEGIN A ::= REAL END", "jer"
         )
 
@@ -49,7 +49,7 @@ class Asn1ToolsJerTest(unittest.TestCase):
         self.assertEqual(foo.decode("A", b'"-0"'), 0.0)
 
     def test_bit_string(self):
-        foo = asn1tools.compile_string(
+        foo = asn1tools_ext.compile_string(
             "Foo DEFINITIONS AUTOMATIC TAGS ::= "
             "BEGIN "
             "A ::= BIT STRING "
@@ -68,7 +68,7 @@ class Asn1ToolsJerTest(unittest.TestCase):
             self.assert_encode_decode_string(foo, type_name, decoded, encoded)
 
     def test_octet_string(self):
-        foo = asn1tools.compile_string(
+        foo = asn1tools_ext.compile_string(
             "Foo DEFINITIONS AUTOMATIC TAGS ::= BEGIN A ::= OCTET STRING END", "jer"
         )
 
@@ -78,7 +78,7 @@ class Asn1ToolsJerTest(unittest.TestCase):
             self.assert_encode_decode_string(foo, type_name, decoded, encoded)
 
     def test_object_identifier(self):
-        foo = asn1tools.compile_string(
+        foo = asn1tools_ext.compile_string(
             "Foo DEFINITIONS ::= BEGIN A ::= OBJECT IDENTIFIER END", "jer"
         )
 
@@ -88,7 +88,7 @@ class Asn1ToolsJerTest(unittest.TestCase):
             self.assert_encode_decode_string(foo, type_name, decoded, encoded)
 
     def test_external(self):
-        foo = asn1tools.compile_string(
+        foo = asn1tools_ext.compile_string(
             "Foo DEFINITIONS AUTOMATIC TAGS ::= BEGIN A ::= EXTERNAL END", "jer"
         )
 
@@ -104,7 +104,7 @@ class Asn1ToolsJerTest(unittest.TestCase):
             self.assert_encode_decode_string(foo, type_name, decoded, encoded)
 
     def test_enumerated(self):
-        foo = asn1tools.compile_string(
+        foo = asn1tools_ext.compile_string(
             "Foo DEFINITIONS AUTOMATIC TAGS ::= "
             "BEGIN "
             "A ::= ENUMERATED { "
@@ -121,7 +121,7 @@ class Asn1ToolsJerTest(unittest.TestCase):
             self.assert_encode_decode_string(foo, type_name, decoded, encoded)
 
         # Encode error.
-        with self.assertRaises(asn1tools.EncodeError) as cm:
+        with self.assertRaises(asn1tools_ext.EncodeError) as cm:
             foo.encode("A", "c")
 
         self.assertEqual(
@@ -129,7 +129,7 @@ class Asn1ToolsJerTest(unittest.TestCase):
         )
 
         # Decode error.
-        with self.assertRaises(asn1tools.DecodeError) as cm:
+        with self.assertRaises(asn1tools_ext.DecodeError) as cm:
             foo.decode("A", b'"c"')
 
         self.assertEqual(
@@ -137,7 +137,7 @@ class Asn1ToolsJerTest(unittest.TestCase):
         )
 
     def test_sequence(self):
-        foo = asn1tools.compile_string(
+        foo = asn1tools_ext.compile_string(
             "Foo DEFINITIONS AUTOMATIC TAGS ::= "
             "BEGIN "
             "A ::= SEQUENCE { "
@@ -170,7 +170,7 @@ class Asn1ToolsJerTest(unittest.TestCase):
         self.assertEqual(foo.decode("B", b"{}"), {"a": 5})
 
         # Missing member.
-        with self.assertRaises(asn1tools.EncodeError) as cm:
+        with self.assertRaises(asn1tools_ext.EncodeError) as cm:
             encoded = foo.encode("C", {"a": 1})
 
         self.assertEqual(
@@ -178,7 +178,7 @@ class Asn1ToolsJerTest(unittest.TestCase):
         )
 
     def test_sequence_of(self):
-        foo = asn1tools.compile_string(
+        foo = asn1tools_ext.compile_string(
             "Foo DEFINITIONS ::= BEGIN A ::= SEQUENCE OF INTEGER END", "jer"
         )
 
@@ -188,7 +188,7 @@ class Asn1ToolsJerTest(unittest.TestCase):
             self.assert_encode_decode_string(foo, type_name, decoded, encoded)
 
     def test_set_of(self):
-        foo = asn1tools.compile_string(
+        foo = asn1tools_ext.compile_string(
             "Foo DEFINITIONS ::= BEGIN A ::= SET OF INTEGER END", "jer"
         )
 
@@ -198,7 +198,7 @@ class Asn1ToolsJerTest(unittest.TestCase):
             self.assert_encode_decode_string(foo, type_name, decoded, encoded)
 
     def test_choice(self):
-        foo = asn1tools.compile_string(
+        foo = asn1tools_ext.compile_string(
             "Foo DEFINITIONS AUTOMATIC TAGS ::= "
             "BEGIN "
             "A ::= CHOICE { "
@@ -215,7 +215,7 @@ class Asn1ToolsJerTest(unittest.TestCase):
             self.assert_encode_decode_string(foo, type_name, decoded, encoded)
 
         # Encode error.
-        with self.assertRaises(asn1tools.EncodeError) as cm:
+        with self.assertRaises(asn1tools_ext.EncodeError) as cm:
             foo.encode("A", ("c", None))
 
         self.assertEqual(
@@ -223,7 +223,7 @@ class Asn1ToolsJerTest(unittest.TestCase):
         )
 
         # Decode error.
-        with self.assertRaises(asn1tools.DecodeError) as cm:
+        with self.assertRaises(asn1tools_ext.DecodeError) as cm:
             foo.decode("A", b'{"c": null}')
 
         self.assertEqual(
@@ -231,7 +231,7 @@ class Asn1ToolsJerTest(unittest.TestCase):
         )
 
     def test_utf8_string(self):
-        foo = asn1tools.compile_string(
+        foo = asn1tools_ext.compile_string(
             "Foo DEFINITIONS AUTOMATIC TAGS ::= BEGIN A ::= UTF8String END", "jer"
         )
 
@@ -246,7 +246,7 @@ class Asn1ToolsJerTest(unittest.TestCase):
             self.assert_encode_decode_string(foo, type_name, decoded, encoded)
 
     def test_universal_string(self):
-        foo = asn1tools.compile_string(
+        foo = asn1tools_ext.compile_string(
             "Foo DEFINITIONS AUTOMATIC TAGS ::= BEGIN A ::= UniversalString END", "jer"
         )
 
@@ -259,7 +259,7 @@ class Asn1ToolsJerTest(unittest.TestCase):
             self.assert_encode_decode_string(foo, type_name, decoded, encoded)
 
     def test_utc_time(self):
-        foo = asn1tools.compile_string(
+        foo = asn1tools_ext.compile_string(
             "Foo DEFINITIONS ::= BEGIN A ::= UTCTime END", "jer"
         )
 
@@ -269,7 +269,7 @@ class Asn1ToolsJerTest(unittest.TestCase):
             self.assert_encode_decode_string(foo, type_name, decoded, encoded)
 
     def test_generalized_time(self):
-        foo = asn1tools.compile_string(
+        foo = asn1tools_ext.compile_string(
             "Foo DEFINITIONS ::= BEGIN A ::= GeneralizedTime END", "jer"
         )
 
@@ -279,7 +279,9 @@ class Asn1ToolsJerTest(unittest.TestCase):
             self.assert_encode_decode_string(foo, type_name, decoded, encoded)
 
     def test_any(self):
-        foo = asn1tools.compile_string("Foo DEFINITIONS ::= BEGIN A ::= ANY END", "jer")
+        foo = asn1tools_ext.compile_string(
+            "Foo DEFINITIONS ::= BEGIN A ::= ANY END", "jer"
+        )
 
         with self.assertRaises(NotImplementedError) as cm:
             foo.encode("A", b"")
@@ -292,7 +294,7 @@ class Asn1ToolsJerTest(unittest.TestCase):
         self.assertEqual(str(cm.exception), "ANY is not yet implemented.")
 
     def test_foo(self):
-        foo = asn1tools.compile_files(["tests/files/foo.asn"], "jer")
+        foo = asn1tools_ext.compile_files(["tests/files/foo.asn"], "jer")
 
         self.assertEqual(len(foo.types), 2)
         self.assertTrue(foo.types["Question"] is not None)
@@ -319,9 +321,9 @@ class Asn1ToolsJerTest(unittest.TestCase):
         self.assertEqual(decoded, decoded_message)
 
     def test_decode_length(self):
-        foo = asn1tools.compile_files("tests/files/foo.asn", "jer")
+        foo = asn1tools_ext.compile_files("tests/files/foo.asn", "jer")
 
-        with self.assertRaises(asn1tools.DecodeError) as cm:
+        with self.assertRaises(asn1tools_ext.DecodeError) as cm:
             foo.decode_length(b"")
 
         self.assertEqual(
@@ -329,7 +331,7 @@ class Asn1ToolsJerTest(unittest.TestCase):
         )
 
     def test_rrc_8_6_0(self):
-        rrc = asn1tools.compile_dict(deepcopy(RRC_8_6_0), "jer")
+        rrc = asn1tools_ext.compile_dict(deepcopy(RRC_8_6_0), "jer")
 
         # Message 1.
         decoded_message = {
@@ -646,7 +648,7 @@ class Asn1ToolsJerTest(unittest.TestCase):
         self.assertEqual(decoded, decoded_message)
 
     def test_all_types(self):
-        foo = asn1tools.compile_files("tests/files/all_types.asn", "jer")
+        foo = asn1tools_ext.compile_files("tests/files/all_types.asn", "jer")
 
         datas = [
             ("Boolean", True, b"true"),
@@ -684,7 +686,7 @@ class Asn1ToolsJerTest(unittest.TestCase):
         self.assertEqual(foo.decode("Bitstring", encoded_message), decoded_message)
 
     def test_repr_all_types(self):
-        foo = asn1tools.compile_files("tests/files/all_types.asn", "jer")
+        foo = asn1tools_ext.compile_files("tests/files/all_types.asn", "jer")
 
         self.assertEqual(repr(foo.types["Boolean"]), "Boolean(Boolean)")
         self.assertEqual(repr(foo.types["Integer"]), "Integer(Integer)")
@@ -742,7 +744,9 @@ class Asn1ToolsJerTest(unittest.TestCase):
         )
 
     def test_all_types_automatic_tags(self):
-        foo = asn1tools.compile_files("tests/files/all_types_automatic_tags.asn", "jer")
+        foo = asn1tools_ext.compile_files(
+            "tests/files/all_types_automatic_tags.asn", "jer"
+        )
 
         datas = [("Sequence3", {"a": 1, "c": 2, "d": True}, b'{"a":1,"c":2,"d":true}')]
 
@@ -750,7 +754,7 @@ class Asn1ToolsJerTest(unittest.TestCase):
             self.assert_encode_decode_string(foo, type_name, decoded, encoded)
 
     def test_indent(self):
-        foo = asn1tools.compile_string(
+        foo = asn1tools_ext.compile_string(
             "Foo DEFINITIONS AUTOMATIC TAGS ::= "
             "BEGIN "
             "A ::= SEQUENCE { "
@@ -789,7 +793,7 @@ class Asn1ToolsJerTest(unittest.TestCase):
                 self.assertIn(line, encoded_lines)
 
     def test_not_support_decode_with_length(self):
-        foo = asn1tools.compile_string(
+        foo = asn1tools_ext.compile_string(
             "Foo DEFINITIONS AUTOMATIC TAGS ::= BEGIN A ::= OCTET STRING END", "jer"
         )
 

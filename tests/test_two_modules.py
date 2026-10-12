@@ -1,6 +1,6 @@
 import unittest
 from .utils import Asn1ToolsBaseTest
-import asn1tools
+import asn1tools_ext
 
 
 class Asn1ToolsTwoModulesTest(Asn1ToolsBaseTest):
@@ -9,7 +9,7 @@ class Asn1ToolsTwoModulesTest(Asn1ToolsBaseTest):
     def test_uper(self):
         files = ["tests/files/module-1.asn", "tests/files/module-2.asn"]
 
-        spec = asn1tools.compile_files(files, "uper")
+        spec = asn1tools_ext.compile_files(files, "uper")
 
         # Message 1.
         decoded = {"priority": "high", "src": 1, "dst": 2, "num": 0, "length": 256}

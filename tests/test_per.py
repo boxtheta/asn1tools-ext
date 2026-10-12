@@ -3,7 +3,7 @@
 
 import unittest
 from .utils import Asn1ToolsBaseTest
-import asn1tools
+import asn1tools_ext
 import sys
 from copy import deepcopy
 
@@ -21,7 +21,7 @@ class Asn1ToolsPerTest(Asn1ToolsBaseTest):
     maxDiff = None
 
     def test_boolean(self):
-        foo = asn1tools.compile_string(
+        foo = asn1tools_ext.compile_string(
             "Foo DEFINITIONS AUTOMATIC TAGS ::= "
             "BEGIN "
             "A ::= BOOLEAN "
@@ -45,13 +45,13 @@ class Asn1ToolsPerTest(Asn1ToolsBaseTest):
         for type_name, decoded, encoded in datas:
             self.assert_encode_decode(foo, type_name, decoded, encoded)
 
-        with self.assertRaises(asn1tools.DecodeError) as cm:
+        with self.assertRaises(asn1tools_ext.DecodeError) as cm:
             foo.decode("A", b"")
 
         self.assertEqual(str(cm.exception), "A: out of data (At bit offset: 0)")
 
     def test_integer(self):
-        foo = asn1tools.compile_string(
+        foo = asn1tools_ext.compile_string(
             "Foo DEFINITIONS AUTOMATIC TAGS ::= "
             "BEGIN "
             "A ::= INTEGER "
@@ -162,7 +162,7 @@ class Asn1ToolsPerTest(Asn1ToolsBaseTest):
             self.assert_encode_decode(foo, type_name, decoded, encoded)
 
     def test_real(self):
-        foo = asn1tools.compile_string(
+        foo = asn1tools_ext.compile_string(
             "Foo DEFINITIONS AUTOMATIC TAGS ::= "
             "BEGIN "
             "A ::= REAL "
@@ -188,7 +188,7 @@ class Asn1ToolsPerTest(Asn1ToolsBaseTest):
             self.assert_encode_decode(foo, type_name, decoded, encoded)
 
     def test_bit_string(self):
-        foo = asn1tools.compile_string(
+        foo = asn1tools_ext.compile_string(
             "Foo DEFINITIONS AUTOMATIC TAGS ::= "
             "BEGIN "
             "A ::= BIT STRING "
@@ -276,7 +276,7 @@ class Asn1ToolsPerTest(Asn1ToolsBaseTest):
             self.assertEqual(foo.decode(type_name, encoded), decoded_2)
 
     def test_octet_string(self):
-        foo = asn1tools.compile_string(
+        foo = asn1tools_ext.compile_string(
             "Foo DEFINITIONS AUTOMATIC TAGS ::= "
             "BEGIN "
             "A ::= OCTET STRING "
@@ -358,7 +358,7 @@ class Asn1ToolsPerTest(Asn1ToolsBaseTest):
             self.assert_encode_decode(foo, type_name, decoded, encoded)
 
     def test_object_identifier(self):
-        foo = asn1tools.compile_string(
+        foo = asn1tools_ext.compile_string(
             "Foo DEFINITIONS AUTOMATIC TAGS ::= "
             "BEGIN "
             "A ::= OBJECT IDENTIFIER "
@@ -380,7 +380,7 @@ class Asn1ToolsPerTest(Asn1ToolsBaseTest):
             self.assert_encode_decode(foo, type_name, decoded, encoded)
 
     def test_external(self):
-        foo = asn1tools.compile_string(
+        foo = asn1tools_ext.compile_string(
             "Foo DEFINITIONS AUTOMATIC TAGS ::= BEGIN A ::= EXTERNAL END", "per"
         )
 
@@ -390,7 +390,7 @@ class Asn1ToolsPerTest(Asn1ToolsBaseTest):
             self.assert_encode_decode(foo, type_name, decoded, encoded)
 
     def test_enumerated(self):
-        foo = asn1tools.compile_string(
+        foo = asn1tools_ext.compile_string(
             "Foo DEFINITIONS AUTOMATIC TAGS ::= "
             "BEGIN "
             "A ::= ENUMERATED { one(1) } "
@@ -457,7 +457,7 @@ class Asn1ToolsPerTest(Asn1ToolsBaseTest):
             self.assertEqual(foo.decode(type_name, encoded_1), decoded_2)
 
         # Bad root index.
-        with self.assertRaises(asn1tools.DecodeError) as cm:
+        with self.assertRaises(asn1tools_ext.DecodeError) as cm:
             foo.decode("C", b"\x70")
 
         self.assertEqual(
@@ -468,7 +468,7 @@ class Asn1ToolsPerTest(Asn1ToolsBaseTest):
         self.assertEqual(foo.decode("C", b"\x8f"), None)
 
     def test_sequence(self):
-        foo = asn1tools.compile_string(
+        foo = asn1tools_ext.compile_string(
             "Foo DEFINITIONS AUTOMATIC TAGS ::= "
             "BEGIN "
             "A ::= SEQUENCE {} "
@@ -683,13 +683,13 @@ class Asn1ToolsPerTest(Asn1ToolsBaseTest):
         )
 
         # Decode error of present addition member (out of data).
-        with self.assertRaises(asn1tools.DecodeError) as cm:
+        with self.assertRaises(asn1tools_ext.DecodeError) as cm:
             foo.decode("U", b"\x80\x80\x03\x02\x05")
 
         self.assertEqual(str(cm.exception), "U.a.a: out of data (At bit offset: 32)")
 
         # Missing root member.
-        with self.assertRaises(asn1tools.EncodeError) as cm:
+        with self.assertRaises(asn1tools_ext.EncodeError) as cm:
             foo.encode("K", {"b": True})
 
         self.assertEqual(
@@ -697,7 +697,7 @@ class Asn1ToolsPerTest(Asn1ToolsBaseTest):
         )
 
     def test_sequence_of(self):
-        foo = asn1tools.compile_string(
+        foo = asn1tools_ext.compile_string(
             "Foo DEFINITIONS AUTOMATIC TAGS ::= "
             "BEGIN "
             "A ::= SEQUENCE OF INTEGER "
@@ -757,7 +757,7 @@ class Asn1ToolsPerTest(Asn1ToolsBaseTest):
             self.assert_encode_decode(foo, type_name, decoded, encoded)
 
     def test_choice(self):
-        foo = asn1tools.compile_string(
+        foo = asn1tools_ext.compile_string(
             "Foo DEFINITIONS AUTOMATIC TAGS ::= "
             "BEGIN "
             "A ::= CHOICE { "
@@ -885,7 +885,7 @@ class Asn1ToolsPerTest(Asn1ToolsBaseTest):
             self.assert_encode_decode(foo, type_name, decoded, encoded)
 
         # Bad root index.
-        with self.assertRaises(asn1tools.DecodeError) as cm:
+        with self.assertRaises(asn1tools_ext.DecodeError) as cm:
             foo.decode("K", b"\x70")
 
         self.assertEqual(
@@ -897,7 +897,7 @@ class Asn1ToolsPerTest(Asn1ToolsBaseTest):
         self.assertEqual(decoded, (None, None))
 
         # Bad value.
-        with self.assertRaises(asn1tools.EncodeError) as cm:
+        with self.assertRaises(asn1tools_ext.EncodeError) as cm:
             foo.encode("K", ("i", True), check_types=False)
 
         self.assertEqual(
@@ -906,13 +906,13 @@ class Asn1ToolsPerTest(Asn1ToolsBaseTest):
         )
 
         # Bad value.
-        with self.assertRaises(asn1tools.EncodeError) as cm:
+        with self.assertRaises(asn1tools_ext.EncodeError) as cm:
             foo.encode("A", ("b", True), check_types=False, check_constraints=False)
 
         self.assertEqual(str(cm.exception), "A: Expected choice 'a', but got 'b'.")
 
     def test_utf8_string(self):
-        foo = asn1tools.compile_string(
+        foo = asn1tools_ext.compile_string(
             "Foo DEFINITIONS AUTOMATIC TAGS ::= "
             "BEGIN "
             "A ::= SEQUENCE { "
@@ -953,20 +953,20 @@ class Asn1ToolsPerTest(Asn1ToolsBaseTest):
         for type_name, decoded, encoded in datas:
             self.assert_encode_decode(foo, type_name, decoded, encoded)
 
-        with self.assertRaises(asn1tools.DecodeError) as cm:
+        with self.assertRaises(asn1tools_ext.DecodeError) as cm:
             foo.decode("A", b"\x40\xc5\x00\x00\x00\x00")
 
         self.assertEqual(
             str(cm.exception), "A.b: Bad length determinant fragmentation value 0xc5."
         )
 
-        with self.assertRaises(asn1tools.DecodeError) as cm:
+        with self.assertRaises(asn1tools_ext.DecodeError) as cm:
             foo.decode("A", b"\x40\xc1\x00\x00\x00\x00")
 
         self.assertEqual(str(cm.exception), "A.b: out of data (At bit offset: 16)")
 
     def test_numeric_string(self):
-        foo = asn1tools.compile_string(
+        foo = asn1tools_ext.compile_string(
             "Foo DEFINITIONS AUTOMATIC TAGS ::= "
             "BEGIN "
             'A ::= NumericString (FROM ("0".."2", ..., "4".."5")) '
@@ -1008,7 +1008,7 @@ class Asn1ToolsPerTest(Asn1ToolsBaseTest):
         )
 
     def test_printable_string(self):
-        foo = asn1tools.compile_string(
+        foo = asn1tools_ext.compile_string(
             "Foo DEFINITIONS AUTOMATIC TAGS ::= "
             "BEGIN "
             "D ::= SEQUENCE { "
@@ -1047,7 +1047,7 @@ class Asn1ToolsPerTest(Asn1ToolsBaseTest):
             self.assert_encode_decode(foo, type_name, decoded, encoded)
 
     def test_ia5_string(self):
-        foo = asn1tools.compile_string(
+        foo = asn1tools_ext.compile_string(
             "Foo DEFINITIONS AUTOMATIC TAGS ::= BEGIN A ::= IA5String END", "per"
         )
 
@@ -1082,7 +1082,7 @@ class Asn1ToolsPerTest(Asn1ToolsBaseTest):
             self.assert_encode_decode(foo, type_name, decoded, encoded)
 
     def test_visible_string(self):
-        foo = asn1tools.compile_string(
+        foo = asn1tools_ext.compile_string(
             "Foo DEFINITIONS AUTOMATIC TAGS ::= "
             "BEGIN "
             "A ::= VisibleString (SIZE (19..133)) "
@@ -1147,7 +1147,7 @@ class Asn1ToolsPerTest(Asn1ToolsBaseTest):
             self.assert_encode_decode(foo, type_name, decoded, encoded)
 
         # Bad character 0x19 should raise an exception.
-        with self.assertRaises(asn1tools.EncodeError) as cm:
+        with self.assertRaises(asn1tools_ext.EncodeError) as cm:
             foo.encode("A", "\x19", check_constraints=False)
 
         self.assertEqual(
@@ -1158,7 +1158,7 @@ class Asn1ToolsPerTest(Asn1ToolsBaseTest):
         )
 
     def test_general_string(self):
-        foo = asn1tools.compile_string(
+        foo = asn1tools_ext.compile_string(
             "Foo DEFINITIONS AUTOMATIC TAGS ::= "
             "BEGIN "
             "A ::= GeneralString "
@@ -1180,7 +1180,7 @@ class Asn1ToolsPerTest(Asn1ToolsBaseTest):
             self.assert_encode_decode(foo, type_name, decoded, encoded)
 
     def test_bmp_string(self):
-        foo = asn1tools.compile_string(
+        foo = asn1tools_ext.compile_string(
             "Foo DEFINITIONS AUTOMATIC TAGS ::= "
             "BEGIN "
             "A ::= BMPString "
@@ -1206,7 +1206,7 @@ class Asn1ToolsPerTest(Asn1ToolsBaseTest):
         for type_name, decoded, encoded in datas:
             self.assert_encode_decode(foo, type_name, decoded, encoded)
 
-        with self.assertRaises(asn1tools.DecodeError) as cm:
+        with self.assertRaises(asn1tools_ext.DecodeError) as cm:
             foo.decode("A", b"\x01\xd8\x00")
 
         valid_chars = [v for v in range(65536) if v < 0xD800 or v > 0xDFFF]
@@ -1220,7 +1220,7 @@ class Asn1ToolsPerTest(Asn1ToolsBaseTest):
         )
 
     def test_graphic_string(self):
-        foo = asn1tools.compile_string(
+        foo = asn1tools_ext.compile_string(
             "Foo DEFINITIONS AUTOMATIC TAGS ::= "
             "BEGIN "
             "A ::= GraphicString "
@@ -1242,7 +1242,7 @@ class Asn1ToolsPerTest(Asn1ToolsBaseTest):
             self.assert_encode_decode(foo, type_name, decoded, encoded)
 
     def test_teletex_string(self):
-        foo = asn1tools.compile_string(
+        foo = asn1tools_ext.compile_string(
             "Foo DEFINITIONS AUTOMATIC TAGS ::= "
             "BEGIN "
             "A ::= TeletexString "
@@ -1263,7 +1263,7 @@ class Asn1ToolsPerTest(Asn1ToolsBaseTest):
             self.assert_encode_decode(foo, type_name, decoded, encoded)
 
     def test_universal_string(self):
-        foo = asn1tools.compile_string(
+        foo = asn1tools_ext.compile_string(
             "Foo DEFINITIONS AUTOMATIC TAGS ::= "
             "BEGIN "
             "A ::= UniversalString "
@@ -1285,7 +1285,7 @@ class Asn1ToolsPerTest(Asn1ToolsBaseTest):
             self.assert_encode_decode(foo, type_name, decoded, encoded)
 
     def test_foo(self):
-        foo = asn1tools.compile_files("tests/files/foo.asn", "per")
+        foo = asn1tools_ext.compile_files("tests/files/foo.asn", "per")
 
         self.assertEqual(len(foo.types), 2)
         self.assertTrue(foo.types["Question"] is not None)
@@ -1310,9 +1310,9 @@ class Asn1ToolsPerTest(Asn1ToolsBaseTest):
         self.assertEqual(decoded, {"id": 1, "answer": False})
 
     def test_decode_length(self):
-        foo = asn1tools.compile_files("tests/files/foo.asn", "per")
+        foo = asn1tools_ext.compile_files("tests/files/foo.asn", "per")
 
-        with self.assertRaises(asn1tools.DecodeError) as cm:
+        with self.assertRaises(asn1tools_ext.DecodeError) as cm:
             foo.decode_length(b"")
 
         self.assertEqual(
@@ -1320,7 +1320,7 @@ class Asn1ToolsPerTest(Asn1ToolsBaseTest):
         )
 
     def test_versions(self):
-        foo = asn1tools.compile_files("tests/files/versions.asn", "per")
+        foo = asn1tools_ext.compile_files("tests/files/versions.asn", "per")
 
         # Encode as V1, decode as V1, V2 and V3
         decoded_v1 = {
@@ -1366,7 +1366,7 @@ class Asn1ToolsPerTest(Asn1ToolsBaseTest):
         self.assertEqual(foo.decode("V3", encoded_v3), decoded_v3)
 
     def test_x691_a1(self):
-        a1 = asn1tools.compile_files("tests/files/x691_a1.asn", "per")
+        a1 = asn1tools_ext.compile_files("tests/files/x691_a1.asn", "per")
 
         decoded = {
             "name": {"givenName": "John", "initial": "P", "familyName": "Smith"},
@@ -1410,7 +1410,7 @@ class Asn1ToolsPerTest(Asn1ToolsBaseTest):
         self.assert_encode_decode(a1, "PersonnelRecord", decoded, encoded)
 
     def test_x691_a2(self):
-        a2 = asn1tools.compile_files("tests/files/x691_a2.asn", "per")
+        a2 = asn1tools_ext.compile_files("tests/files/x691_a2.asn", "per")
 
         decoded = {
             "name": {"givenName": "John", "initial": "P", "familyName": "Smith"},
@@ -1453,7 +1453,7 @@ class Asn1ToolsPerTest(Asn1ToolsBaseTest):
         self.assert_encode_decode(a2, "PersonnelRecord", decoded, encoded)
 
     def test_x691_a3(self):
-        a3 = asn1tools.compile_files("tests/files/x691_a3.asn", "per")
+        a3 = asn1tools_ext.compile_files("tests/files/x691_a3.asn", "per")
 
         decoded = {
             "name": {"givenName": "John", "initial": "P", "familyName": "Smith"},
@@ -1498,7 +1498,7 @@ class Asn1ToolsPerTest(Asn1ToolsBaseTest):
         self.assert_encode_decode(a3, "PersonnelRecord", decoded, encoded)
 
     def test_x691_a4(self):
-        a4 = asn1tools.compile_dict(deepcopy(X691_A4), "per")
+        a4 = asn1tools_ext.compile_dict(deepcopy(X691_A4), "per")
 
         decoded = {"a": 253, "b": True, "c": ("e", True), "g": "123", "h": True}
 
@@ -1507,7 +1507,7 @@ class Asn1ToolsPerTest(Asn1ToolsBaseTest):
         self.assert_encode_decode(a4, "Ax", decoded, encoded)
 
     def test_rrc_8_6_0(self):
-        rrc = asn1tools.compile_dict(deepcopy(RRC_8_6_0), "per")
+        rrc = asn1tools_ext.compile_dict(deepcopy(RRC_8_6_0), "per")
 
         # Message 1.
         decoded = {
@@ -1769,7 +1769,7 @@ class Asn1ToolsPerTest(Asn1ToolsBaseTest):
         self.assert_encode_decode(rrc, "BCCH-DL-SCH-Message", decoded, encoded)
 
     def test_all_types_automatic_tags(self):
-        all_types = asn1tools.compile_files(
+        all_types = asn1tools_ext.compile_files(
             "tests/files/all_types_automatic_tags.asn", "per"
         )
 
@@ -1783,7 +1783,7 @@ class Asn1ToolsPerTest(Asn1ToolsBaseTest):
     def test_bar(self):
         """A simple example."""
 
-        bar = asn1tools.compile_files("tests/files/bar.asn", "per")
+        bar = asn1tools_ext.compile_files("tests/files/bar.asn", "per")
 
         # Message 1.
         decoded = {
@@ -1808,7 +1808,7 @@ class Asn1ToolsPerTest(Asn1ToolsBaseTest):
         self.assert_encode_decode(bar, "GetRequest", decoded, encoded)
 
     def test_repr_all_types(self):
-        all_types = asn1tools.compile_files("tests/files/all_types.asn", "per")
+        all_types = asn1tools_ext.compile_files("tests/files/all_types.asn", "per")
 
         self.assertEqual(repr(all_types.types["Boolean"]), "Boolean(Boolean)")
         self.assertEqual(repr(all_types.types["Integer"]), "Integer(Integer)")
@@ -1868,8 +1868,8 @@ class Asn1ToolsPerTest(Asn1ToolsBaseTest):
         # ToDo: Do not skip!
         return
 
-        with self.assertRaises(asn1tools.CompileError):
-            s1ap = asn1tools.compile_dict(deepcopy(S1AP_14_4_0), "per")
+        with self.assertRaises(asn1tools_ext.CompileError):
+            s1ap = asn1tools_ext.compile_dict(deepcopy(S1AP_14_4_0), "per")
 
         # Message 1.
         decoded_message = (
@@ -1907,7 +1907,7 @@ class Asn1ToolsPerTest(Asn1ToolsBaseTest):
         # ToDo: Fix when supported.
         return
 
-        information_object = asn1tools.compile_files(
+        information_object = asn1tools_ext.compile_files(
             "tests/files/information_object.asn", "per"
         )
 
@@ -2006,7 +2006,7 @@ class Asn1ToolsPerTest(Asn1ToolsBaseTest):
             self.assertEqual(encoded, encoded_message)
 
     def test_oma_ulp(self):
-        ulp = asn1tools.compile_dict(deepcopy(OMA_ULP), "per")
+        ulp = asn1tools_ext.compile_dict(deepcopy(OMA_ULP), "per")
 
         decoded = {
             "length": 162,
@@ -2139,7 +2139,7 @@ class Asn1ToolsPerTest(Asn1ToolsBaseTest):
         self.assert_encode_decode(ulp, "ULP-PDU", decoded, encoded)
 
     def test_not_support_decode_with_length(self):
-        foo = asn1tools.compile_string(
+        foo = asn1tools_ext.compile_string(
             "Foo DEFINITIONS AUTOMATIC TAGS ::= BEGIN A ::= OCTET STRING END", "oer"
         )
 

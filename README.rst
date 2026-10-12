@@ -151,7 +151,7 @@ Contributing
 
    .. code-block:: text
 
-      pip install -r requirements.txt
+      uv sync
 
 #. Implement the new feature or bug fix.
 
@@ -162,7 +162,7 @@ Contributing
 
    .. code-block:: text
 
-      make test
+      uv run python -m unittest
 
 #. Create a pull request.
 

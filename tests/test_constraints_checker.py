@@ -1,7 +1,7 @@
 import unittest
 from datetime import datetime
 from .utils import Asn1ToolsBaseTest
-import asn1tools
+import asn1tools_ext
 
 
 class Asn1ToolsCheckConstraintsTest(Asn1ToolsBaseTest):
@@ -15,7 +15,7 @@ class Asn1ToolsCheckConstraintsTest(Asn1ToolsBaseTest):
     def assert_encode_decode_bad(self, foo, datas, decode_check=True):
         for type_name, decoded, message in datas:
             # Encode check.
-            with self.assertRaises(asn1tools.ConstraintsError) as cm:
+            with self.assertRaises(asn1tools_ext.ConstraintsError) as cm:
                 foo.encode(type_name, decoded, check_constraints=True)
 
             self.assertEqual(str(cm.exception), message)
@@ -24,7 +24,7 @@ class Asn1ToolsCheckConstraintsTest(Asn1ToolsBaseTest):
             if decode_check:
                 encoded = foo.encode(type_name, decoded, check_constraints=False)
 
-                with self.assertRaises(asn1tools.ConstraintsError) as cm:
+                with self.assertRaises(asn1tools_ext.ConstraintsError) as cm:
                     foo.decode(type_name, encoded, check_constraints=True)
 
                 self.assertEqual(str(cm.exception), message)
@@ -33,7 +33,7 @@ class Asn1ToolsCheckConstraintsTest(Asn1ToolsBaseTest):
         codecs = ["ber", "der", "gser", "jer", "per", "uper", "xer"]
 
         for codec in codecs:
-            foo = asn1tools.compile_string(
+            foo = asn1tools_ext.compile_string(
                 "Foo DEFINITIONS AUTOMATIC TAGS ::= BEGIN A ::= INTEGER END", codec
             )
 
@@ -43,7 +43,7 @@ class Asn1ToolsCheckConstraintsTest(Asn1ToolsBaseTest):
                 foo.decode("A", encoded, check_constraints=True)
 
     def test_boolean(self):
-        foo = asn1tools.compile_string(
+        foo = asn1tools_ext.compile_string(
             "Foo DEFINITIONS AUTOMATIC TAGS ::= BEGIN A ::= BOOLEAN END"
         )
 
@@ -58,7 +58,7 @@ class Asn1ToolsCheckConstraintsTest(Asn1ToolsBaseTest):
         self.assert_encode_decode_bad(foo, datas)
 
     def test_integer(self):
-        foo = asn1tools.compile_string(
+        foo = asn1tools_ext.compile_string(
             "Foo DEFINITIONS AUTOMATIC TAGS ::= "
             "BEGIN "
             "A ::= INTEGER "
@@ -133,7 +133,7 @@ class Asn1ToolsCheckConstraintsTest(Asn1ToolsBaseTest):
         self.assert_encode_decode_bad(foo, datas)
 
     def test_real(self):
-        foo = asn1tools.compile_string(
+        foo = asn1tools_ext.compile_string(
             "Foo DEFINITIONS AUTOMATIC TAGS ::= BEGIN A ::= REAL END"
         )
 
@@ -148,7 +148,7 @@ class Asn1ToolsCheckConstraintsTest(Asn1ToolsBaseTest):
         self.assert_encode_decode_bad(foo, datas)
 
     def test_null(self):
-        foo = asn1tools.compile_string(
+        foo = asn1tools_ext.compile_string(
             "Foo DEFINITIONS AUTOMATIC TAGS ::= BEGIN A ::= NULL END"
         )
 
@@ -158,7 +158,7 @@ class Asn1ToolsCheckConstraintsTest(Asn1ToolsBaseTest):
         self.assert_encode_decode_ok(foo, datas)
 
     def test_bit_string(self):
-        foo = asn1tools.compile_string(
+        foo = asn1tools_ext.compile_string(
             "Foo DEFINITIONS AUTOMATIC TAGS ::= "
             "BEGIN "
             "A ::= BIT STRING "
@@ -179,7 +179,7 @@ class Asn1ToolsCheckConstraintsTest(Asn1ToolsBaseTest):
         self.assert_encode_decode_bad(foo, datas)
 
     def test_octet_string(self):
-        foo = asn1tools.compile_string(
+        foo = asn1tools_ext.compile_string(
             "Foo DEFINITIONS AUTOMATIC TAGS ::= "
             "BEGIN "
             "A ::= OCTET STRING "
@@ -208,7 +208,7 @@ class Asn1ToolsCheckConstraintsTest(Asn1ToolsBaseTest):
         self.assert_encode_decode_bad(foo, datas)
 
     def test_enumerated(self):
-        foo = asn1tools.compile_string(
+        foo = asn1tools_ext.compile_string(
             "Foo DEFINITIONS AUTOMATIC TAGS ::= BEGIN A ::= ENUMERATED { a, b } END"
         )
 
@@ -218,7 +218,7 @@ class Asn1ToolsCheckConstraintsTest(Asn1ToolsBaseTest):
         self.assert_encode_decode_ok(foo, datas)
 
     def test_sequence(self):
-        foo = asn1tools.compile_string(
+        foo = asn1tools_ext.compile_string(
             "Foo DEFINITIONS AUTOMATIC TAGS ::= "
             "BEGIN "
             "A ::= SEQUENCE { "
@@ -238,7 +238,7 @@ class Asn1ToolsCheckConstraintsTest(Asn1ToolsBaseTest):
         self.assert_encode_decode_bad(foo, datas)
 
     def test_sequence_of(self):
-        foo = asn1tools.compile_string(
+        foo = asn1tools_ext.compile_string(
             "Foo DEFINITIONS AUTOMATIC TAGS ::= "
             "BEGIN "
             "A ::= SEQUENCE (SIZE (2)) OF INTEGER (3..5)"
@@ -270,7 +270,7 @@ class Asn1ToolsCheckConstraintsTest(Asn1ToolsBaseTest):
         self.assert_encode_decode_bad(foo, datas)
 
     def test_numeric_string(self):
-        foo = asn1tools.compile_string(
+        foo = asn1tools_ext.compile_string(
             "Foo DEFINITIONS AUTOMATIC TAGS ::= BEGIN A ::= NumericString END"
         )
 
@@ -288,7 +288,7 @@ class Asn1ToolsCheckConstraintsTest(Asn1ToolsBaseTest):
         self.assert_encode_decode_bad(foo, datas)
 
     def test_printable_string(self):
-        foo = asn1tools.compile_string(
+        foo = asn1tools_ext.compile_string(
             "Foo DEFINITIONS AUTOMATIC TAGS ::= BEGIN A ::= PrintableString END"
         )
 
@@ -311,7 +311,7 @@ class Asn1ToolsCheckConstraintsTest(Asn1ToolsBaseTest):
         self.assert_encode_decode_bad(foo, datas)
 
     def test_ia5_string(self):
-        foo = asn1tools.compile_string(
+        foo = asn1tools_ext.compile_string(
             "Foo DEFINITIONS AUTOMATIC TAGS ::= BEGIN A ::= IA5String END"
         )
 
@@ -334,7 +334,7 @@ class Asn1ToolsCheckConstraintsTest(Asn1ToolsBaseTest):
         self.assert_encode_decode_bad(foo, datas, decode_check=False)
 
     def test_visible_string(self):
-        foo = asn1tools.compile_string(
+        foo = asn1tools_ext.compile_string(
             "Foo DEFINITIONS AUTOMATIC TAGS ::= "
             "BEGIN "
             "A ::= VisibleString "
@@ -369,7 +369,7 @@ class Asn1ToolsCheckConstraintsTest(Asn1ToolsBaseTest):
         self.assert_encode_decode_bad(foo, datas)
 
     def test_utf8_string(self):
-        foo = asn1tools.compile_string(
+        foo = asn1tools_ext.compile_string(
             "Foo DEFINITIONS AUTOMATIC TAGS ::= "
             "BEGIN "
             "A ::= UTF8String "
@@ -391,7 +391,7 @@ class Asn1ToolsCheckConstraintsTest(Asn1ToolsBaseTest):
         self.assert_encode_decode_bad(foo, datas)
 
     def test_utc_time(self):
-        foo = asn1tools.compile_string(
+        foo = asn1tools_ext.compile_string(
             "Foo DEFINITIONS AUTOMATIC TAGS ::= BEGIN A ::= UTCTime END"
         )
 
@@ -406,7 +406,7 @@ class Asn1ToolsCheckConstraintsTest(Asn1ToolsBaseTest):
         self.assert_encode_decode_bad(foo, datas)
 
     def test_choice(self):
-        foo = asn1tools.compile_string(
+        foo = asn1tools_ext.compile_string(
             "Foo DEFINITIONS AUTOMATIC TAGS ::= "
             "BEGIN "
             "A ::= CHOICE { a INTEGER (1..2) } "

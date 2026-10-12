@@ -9,17 +9,17 @@ from copy import deepcopy
 from datetime import datetime
 from .utils import Asn1ToolsBaseTest
 
-import asn1tools
-from asn1tools.codecs import utc_time_to_datetime as ut2dt
-from asn1tools.compat import timezone
-from asn1tools.compat import timedelta
+import asn1tools_ext
+from asn1tools_ext.codecs import utc_time_to_datetime as ut2dt
+from datetime import timezone
+from datetime import timedelta
 
 sys.path.append("tests/files")
 sys.path.append("tests/files/3gpp")
 sys.path.append("tests/files/ietf")
 
 from rrc_8_6_0 import EXPECTED as RRC_8_6_0
-from rfc4511 import EXPECTED as RFC4511
+from sketch import EXPECTED as SKETCH
 from rfc5280 import EXPECTED as RFC5280
 from rfc5280_modified import EXPECTED as RFC5280_MODIFIED
 from zforce import EXPECTED as ZFORCE
@@ -30,7 +30,7 @@ class Asn1ToolsBerTest(Asn1ToolsBaseTest):
     maxDiff = None
 
     def test_boolean(self):
-        foo = asn1tools.compile_string(
+        foo = asn1tools_ext.compile_string(
             "Foo DEFINITIONS AUTOMATIC TAGS ::= BEGIN A ::= BOOLEAN END"
         )
 
@@ -43,11 +43,11 @@ class Asn1ToolsBerTest(Asn1ToolsBaseTest):
         """Test explicit tags on booleans."""
 
         spec = "Foo DEFINITIONS ::= BEGIN Foo ::= [2] BOOLEAN END"
-        foo = asn1tools.compile_string(spec)
+        foo = asn1tools_ext.compile_string(spec)
         self.assert_encode_decode(foo, "Foo", True, b"\xa2\x03\x01\x01\xff")
 
         # Bad explicit tag.
-        with self.assertRaises(asn1tools.DecodeError) as cm:
+        with self.assertRaises(asn1tools_ext.DecodeError) as cm:
             foo.decode("Foo", b"\xa3\x03\x01\x01\x01")
 
         self.assertEqual(
@@ -56,7 +56,7 @@ class Asn1ToolsBerTest(Asn1ToolsBaseTest):
         )
 
         # Bad tag.
-        with self.assertRaises(asn1tools.DecodeError) as cm:
+        with self.assertRaises(asn1tools_ext.DecodeError) as cm:
             foo.decode("Foo", b"\xa2\x03\x02\x01\x01")
         self.assertEqual(
             str(cm.exception),
@@ -67,11 +67,11 @@ class Asn1ToolsBerTest(Asn1ToolsBaseTest):
         """Test implicit tags on booleans."""
 
         spec = "Foo DEFINITIONS ::= BEGIN Foo ::= [2] IMPLICIT BOOLEAN END"
-        foo = asn1tools.compile_string(spec)
+        foo = asn1tools_ext.compile_string(spec)
         self.assert_encode_decode(foo, "Foo", True, b"\x82\x01\xff")
 
     def test_integer(self):
-        foo = asn1tools.compile_string(
+        foo = asn1tools_ext.compile_string(
             "Foo DEFINITIONS AUTOMATIC TAGS ::= BEGIN A ::= INTEGER END"
         )
 
@@ -100,40 +100,40 @@ class Asn1ToolsBerTest(Asn1ToolsBaseTest):
         """Test explicit tags on integers."""
 
         spec = "Foo DEFINITIONS ::= BEGIN Foo ::= [2] INTEGER END"
-        foo = asn1tools.compile_string(spec)
+        foo = asn1tools_ext.compile_string(spec)
         self.assert_encode_decode(foo, "Foo", 1, b"\xa2\x03\x02\x01\x01")
 
         spec = "Foo DEFINITIONS ::= BEGIN Foo ::= [2] EXPLICIT INTEGER END"
-        foo = asn1tools.compile_string(spec)
+        foo = asn1tools_ext.compile_string(spec)
         self.assert_encode_decode(foo, "Foo", 1, b"\xa2\x03\x02\x01\x01")
 
         spec = "Foo DEFINITIONS EXPLICIT TAGS ::= BEGIN Foo ::= INTEGER END"
-        foo = asn1tools.compile_string(spec)
+        foo = asn1tools_ext.compile_string(spec)
         self.assert_encode_decode(foo, "Foo", 1, b"\x02\x01\x01")
 
         spec = "Foo DEFINITIONS ::= BEGIN Foo ::= [2] BOOLEAN END"
-        foo = asn1tools.compile_string(spec)
+        foo = asn1tools_ext.compile_string(spec)
         self.assert_encode_decode(foo, "Foo", True, b"\xa2\x03\x01\x01\xff")
 
     def test_integer_implicit_tags(self):
         """Test implicit tags on integers."""
 
         spec = "Foo DEFINITIONS ::= BEGIN Foo ::= [2] IMPLICIT INTEGER END"
-        foo = asn1tools.compile_string(spec)
+        foo = asn1tools_ext.compile_string(spec)
         self.assert_encode_decode(foo, "Foo", 1, b"\x82\x01\x01")
 
         spec = "Foo DEFINITIONS IMPLICIT TAGS ::= BEGIN Foo ::= INTEGER END"
-        foo = asn1tools.compile_string(spec)
+        foo = asn1tools_ext.compile_string(spec)
         self.assert_encode_decode(foo, "Foo", 1, b"\x02\x01\x01")
 
         spec = (
             "Foo DEFINITIONS EXPLICIT TAGS ::= BEGIN Foo ::= [2] IMPLICIT INTEGER END"
         )
-        foo = asn1tools.compile_string(spec)
+        foo = asn1tools_ext.compile_string(spec)
         self.assert_encode_decode(foo, "Foo", 1, b"\x82\x01\x01")
 
     def test_real(self):
-        foo = asn1tools.compile_string(
+        foo = asn1tools_ext.compile_string(
             "Foo DEFINITIONS AUTOMATIC TAGS ::= BEGIN A ::= REAL END"
         )
 
@@ -187,14 +187,14 @@ class Asn1ToolsBerTest(Asn1ToolsBaseTest):
         self.assertEqual(foo.decode("A", b"\x09\x01\x43"), -0.0)
 
         # Invalid control words.
-        with self.assertRaises(asn1tools.DecodeError) as cm:
+        with self.assertRaises(asn1tools_ext.DecodeError) as cm:
             foo.decode("A", b"\x09\x01\x44")
 
         self.assertEqual(
             str(cm.exception), "A: Unsupported special REAL control word 0x44."
         )
 
-        with self.assertRaises(asn1tools.DecodeError) as cm:
+        with self.assertRaises(asn1tools_ext.DecodeError) as cm:
             foo.decode("A", b"\x09\x02\x82\x00")
 
         self.assertEqual(
@@ -207,7 +207,7 @@ class Asn1ToolsBerTest(Asn1ToolsBaseTest):
         self.assertEqual(foo.decode("A", b"\x09\x06\x02\x31\x30\x30\x2c\x30"), 100.0)
 
     def test_bit_string(self):
-        foo = asn1tools.compile_string(
+        foo = asn1tools_ext.compile_string(
             "Foo DEFINITIONS AUTOMATIC TAGS ::= "
             "BEGIN "
             "A ::= BIT STRING "
@@ -284,18 +284,18 @@ class Asn1ToolsBerTest(Asn1ToolsBaseTest):
         """Test explicit tags on bit strings."""
 
         spec = "Foo DEFINITIONS ::= BEGIN Foo ::= [2] BIT STRING END"
-        foo = asn1tools.compile_string(spec)
+        foo = asn1tools_ext.compile_string(spec)
         self.assert_encode_decode(foo, "Foo", (b"\x56", 7), b"\xa2\x04\x03\x02\x01\x56")
 
     def test_octet_string_explicit_tags(self):
         """Test explicit tags on octet strings."""
 
         spec = "Foo DEFINITIONS ::= BEGIN Foo ::= [2] OCTET STRING END"
-        foo = asn1tools.compile_string(spec)
+        foo = asn1tools_ext.compile_string(spec)
         self.assert_encode_decode(foo, "Foo", b"\x56", b"\xa2\x03\x04\x01\x56")
 
     def test_object_descriptor(self):
-        foo = asn1tools.compile_string(
+        foo = asn1tools_ext.compile_string(
             "Foo DEFINITIONS ::= "
             "BEGIN "
             "A ::= ObjectDescriptor "
@@ -312,7 +312,7 @@ class Asn1ToolsBerTest(Asn1ToolsBaseTest):
             self.assert_encode_decode(foo, type_name, decoded, encoded)
 
     def test_external_explicit_tags(self):
-        foo = asn1tools.compile_string(
+        foo = asn1tools_ext.compile_string(
             "Foo DEFINITIONS ::= BEGIN A ::= EXTERNAL B ::= [0] EXTERNAL END"
         )
 
@@ -339,7 +339,7 @@ class Asn1ToolsBerTest(Asn1ToolsBaseTest):
             self.assert_encode_decode(foo, type_name, decoded, encoded)
 
     def test_external_implicit_tags(self):
-        foo = asn1tools.compile_string(
+        foo = asn1tools_ext.compile_string(
             "Foo DEFINITIONS IMPLICIT TAGS ::= "
             "BEGIN "
             "A ::= EXTERNAL "
@@ -366,7 +366,7 @@ class Asn1ToolsBerTest(Asn1ToolsBaseTest):
             self.assert_encode_decode(foo, type_name, decoded, encoded)
 
     def test_enumerated(self):
-        foo = asn1tools.compile_dict(deepcopy(ENUMERATED))
+        foo = asn1tools_ext.compile_dict(deepcopy(ENUMERATED))
 
         datas = [
             ("A", "a", b"\x0a\x01\x00"),
@@ -400,7 +400,7 @@ class Asn1ToolsBerTest(Asn1ToolsBaseTest):
         self.assertEqual(foo.decode("F", b"\x0a\x01\xff"), None)
 
         # No addition present.
-        with self.assertRaises(asn1tools.DecodeError) as cm:
+        with self.assertRaises(asn1tools_ext.DecodeError) as cm:
             foo.decode("G", b"\x0a\x01\xff")
 
         self.assertEqual(
@@ -409,7 +409,7 @@ class Asn1ToolsBerTest(Asn1ToolsBaseTest):
         )
 
     def test_sequence(self):
-        foo = asn1tools.compile_string(
+        foo = asn1tools_ext.compile_string(
             "Foo DEFINITIONS AUTOMATIC TAGS ::= "
             "BEGIN "
             "A ::= SEQUENCE {} "
@@ -662,7 +662,7 @@ class Asn1ToolsBerTest(Asn1ToolsBaseTest):
         )
 
         # Test error when EOC tag is missing
-        with self.assertRaises(asn1tools.DecodeError) as cm:
+        with self.assertRaises(asn1tools_ext.DecodeError) as cm:
             foo.decode(
                 "W", b"\x30\x80\x81\x01\x10\x82\x01\x61\xa3\x80\x84\x01\x02\x00\x00"
             )
@@ -673,13 +673,13 @@ class Asn1ToolsBerTest(Asn1ToolsBaseTest):
         )
 
         # Missing member.
-        with self.assertRaises(asn1tools.EncodeError) as cm:
+        with self.assertRaises(asn1tools_ext.EncodeError) as cm:
             foo.encode("C", {})
 
         self.assertEqual(str(cm.exception), "C: Sequence member 'a' not found in {}.")
 
     def test_sequence_of(self):
-        foo = asn1tools.compile_string(
+        foo = asn1tools_ext.compile_string(
             "Foo DEFINITIONS AUTOMATIC TAGS ::= BEGIN A ::= SEQUENCE OF INTEGER END",
             "ber",
         )
@@ -693,7 +693,7 @@ class Asn1ToolsBerTest(Asn1ToolsBaseTest):
         self.assertEqual(foo.decode("A", b"\x30\x80\x00\x00"), [])
 
     def test_set(self):
-        foo = asn1tools.compile_string(
+        foo = asn1tools_ext.compile_string(
             "Foo DEFINITIONS IMPLICIT TAGS ::= "
             "BEGIN "
             "A ::= SET { "
@@ -738,7 +738,7 @@ class Asn1ToolsBerTest(Asn1ToolsBaseTest):
             {"a": {"a": 3, "b": 4}, "b": b"\x12"},
         )
         # Test error when EOC tag is missing
-        with self.assertRaises(asn1tools.DecodeError) as cm:
+        with self.assertRaises(asn1tools_ext.DecodeError) as cm:
             foo.decode(
                 "C", b"\x31\x80\xa0\x80\x80\x01\x03\x81\x01\x04\x81\x01\x12\x00\x00"
             )
@@ -758,7 +758,7 @@ class Asn1ToolsBerTest(Asn1ToolsBaseTest):
         )
 
     def test_choice(self):
-        foo = asn1tools.compile_string(
+        foo = asn1tools_ext.compile_string(
             "Foo DEFINITIONS AUTOMATIC TAGS ::= "
             "BEGIN "
             "A ::= CHOICE { "
@@ -916,7 +916,7 @@ class Asn1ToolsBerTest(Asn1ToolsBaseTest):
         self.assertEqual(foo.decode("L", b"\xa0\x03\x04\x01\x12"), ("a", b"\x12"))
         self.assertEqual(foo.decode("L", b"\x80\x01\x12"), ("a", b"\x12"))
 
-        with self.assertRaises(asn1tools.DecodeError) as cm:
+        with self.assertRaises(asn1tools_ext.DecodeError) as cm:
             foo.decode("A", b"\x81\x01\xff")
         self.assertEqual(
             str(cm.exception),
@@ -929,7 +929,7 @@ class Asn1ToolsBerTest(Asn1ToolsBaseTest):
         )
 
     def test_choice_implicit_tags(self):
-        foo = asn1tools.compile_string(
+        foo = asn1tools_ext.compile_string(
             "Foo DEFINITIONS IMPLICIT TAGS ::= "
             "BEGIN "
             "A ::= CHOICE { "
@@ -999,11 +999,11 @@ class Asn1ToolsBerTest(Asn1ToolsBaseTest):
         )
 
         # Choice decode fail
-        with self.assertRaises(asn1tools.DecodeError) as cm:
+        with self.assertRaises(asn1tools_ext.DecodeError) as cm:
             foo.decode("N", b"\xa1\x01\x05")
 
     def test_utf8_string(self):
-        foo = asn1tools.compile_string(
+        foo = asn1tools_ext.compile_string(
             "Foo DEFINITIONS AUTOMATIC TAGS ::= BEGIN A ::= UTF8String END", "ber"
         )
 
@@ -1017,7 +1017,7 @@ class Asn1ToolsBerTest(Asn1ToolsBaseTest):
             self.assert_encode_decode(foo, type_name, decoded, encoded)
 
     def test_bmp_string(self):
-        foo = asn1tools.compile_string(
+        foo = asn1tools_ext.compile_string(
             "Foo DEFINITIONS IMPLICIT TAGS ::= BEGIN A ::= BMPString END"
         )
 
@@ -1030,7 +1030,7 @@ class Asn1ToolsBerTest(Asn1ToolsBaseTest):
             self.assert_encode_decode(foo, type_name, decoded, encoded)
 
     def test_graphic_string(self):
-        foo = asn1tools.compile_string(
+        foo = asn1tools_ext.compile_string(
             "Foo DEFINITIONS AUTOMATIC TAGS ::= BEGIN A ::= GraphicString END"
         )
 
@@ -1040,7 +1040,7 @@ class Asn1ToolsBerTest(Asn1ToolsBaseTest):
             self.assert_encode_decode(foo, type_name, decoded, encoded)
 
     def test_universal_string(self):
-        foo = asn1tools.compile_string(
+        foo = asn1tools_ext.compile_string(
             "Foo DEFINITIONS AUTOMATIC TAGS ::= BEGIN A ::= UniversalString END"
         )
 
@@ -1053,7 +1053,7 @@ class Asn1ToolsBerTest(Asn1ToolsBaseTest):
             self.assert_encode_decode(foo, type_name, decoded, encoded)
 
     def test_utc_time(self):
-        foo = asn1tools.compile_string(
+        foo = asn1tools_ext.compile_string(
             "Foo DEFINITIONS IMPLICIT TAGS ::= BEGIN A ::= UTCTime END"
         )
 
@@ -1073,13 +1073,13 @@ class Asn1ToolsBerTest(Asn1ToolsBaseTest):
         """Test explicit tags on UTC time."""
 
         spec = "Foo DEFINITIONS ::= BEGIN Foo ::= [2] UTCTime END"
-        foo = asn1tools.compile_string(spec)
+        foo = asn1tools_ext.compile_string(spec)
         self.assert_encode_decode(
             foo, "Foo", ut2dt("121001230001Z"), b"\xa2\x0f\x17\x0d121001230001Z"
         )
 
     def test_generalized_time(self):
-        foo = asn1tools.compile_string(
+        foo = asn1tools_ext.compile_string(
             "Foo DEFINITIONS AUTOMATIC TAGS ::= BEGIN A ::= GeneralizedTime END"
         )
 
@@ -1113,7 +1113,7 @@ class Asn1ToolsBerTest(Asn1ToolsBaseTest):
             self.assert_encode_decode(foo, type_name, decoded, encoded)
 
     def test_foo(self):
-        foo = asn1tools.compile_files(["tests/files/foo.asn"])
+        foo = asn1tools_ext.compile_files(["tests/files/foo.asn"])
 
         self.assertEqual(len(foo.types), 2)
         self.assertTrue(foo.types["Question"] is not None)
@@ -1138,7 +1138,7 @@ class Asn1ToolsBerTest(Asn1ToolsBaseTest):
         self.assertEqual(decoded, {"id": 1, "answer": False})
 
     def test_decode_length(self):
-        foo = asn1tools.compile_files("tests/files/foo.asn")
+        foo = asn1tools_ext.compile_files("tests/files/foo.asn")
 
         # The length can be decoded.
         datas = [
@@ -1161,7 +1161,7 @@ class Asn1ToolsBerTest(Asn1ToolsBaseTest):
             self.assertIsNone(foo.decode_length(encoded))
 
     def test_complex(self):
-        cmplx = asn1tools.compile_files("tests/files/complex.asn")
+        cmplx = asn1tools_ext.compile_files("tests/files/complex.asn")
 
         decoded = {
             "boolean": True,
@@ -1195,7 +1195,7 @@ class Asn1ToolsBerTest(Asn1ToolsBaseTest):
             "ia5-string": "foo",
         }
 
-        with self.assertRaises(asn1tools.EncodeError) as cm:
+        with self.assertRaises(asn1tools_ext.EncodeError) as cm:
             cmplx.encode("AllUniversalTypes", decoded)
 
         self.assertEqual(
@@ -1205,7 +1205,7 @@ class Asn1ToolsBerTest(Asn1ToolsBaseTest):
         )
 
     def test_rrc_8_6_0(self):
-        rrc = asn1tools.compile_dict(deepcopy(RRC_8_6_0))
+        rrc = asn1tools_ext.compile_dict(deepcopy(RRC_8_6_0))
 
         # Message 1.
         decoded = {
@@ -1493,7 +1493,7 @@ class Asn1ToolsBerTest(Asn1ToolsBaseTest):
         self.assert_encode_decode(rrc, "BCCH-DL-SCH-Message", decoded, encoded)
 
     def test_rfc1157(self):
-        rfc1157 = asn1tools.compile_files(
+        rfc1157 = asn1tools_ext.compile_files(
             ["tests/files/ietf/rfc1155.asn", "tests/files/ietf/rfc1157.asn"]
         )
 
@@ -1743,7 +1743,7 @@ class Asn1ToolsBerTest(Asn1ToolsBaseTest):
             ),
         }
 
-        with self.assertRaises(asn1tools.EncodeError) as cm:
+        with self.assertRaises(asn1tools_ext.EncodeError) as cm:
             rfc1157.encode("Message", decoded)
 
         self.assertEqual(
@@ -1753,7 +1753,7 @@ class Asn1ToolsBerTest(Asn1ToolsBaseTest):
         )
 
     def test_performance(self):
-        cmplx = asn1tools.compile_files("tests/files/complex.asn")
+        cmplx = asn1tools_ext.compile_files("tests/files/complex.asn")
 
         decoded = {
             "boolean": True,
@@ -1788,203 +1788,184 @@ class Asn1ToolsBerTest(Asn1ToolsBaseTest):
         ms_per_call = 1000 * res / iterations
         print("{} ms per decode call.".format(round(ms_per_call, 3)))
 
-    def test_rfc4511(self):
-        rfc4511 = asn1tools.compile_dict(deepcopy(RFC4511))
+    def test_sketch(self):
+        sketch = asn1tools_ext.compile_dict(deepcopy(SKETCH))
 
-        # A search request message.
-        decoded = {
-            "messageID": 2,
-            "protocolOp": (
-                "searchRequest",
-                {
-                    "baseObject": b"",
-                    "scope": "wholeSubtree",
-                    "derefAliases": "neverDerefAliases",
-                    "sizeLimit": 0,
-                    "timeLimit": 0,
-                    "typesOnly": False,
-                    "filter": (
-                        "and",
-                        [
+        # A snapshot with nested groups and a long form length.
+        decoded = (
+            "snapshot",
+            {
+                "title": b"floor plan",
+                "units": "pixel",
+                "layers": [
+                    {
+                        "name": b"walls",
+                        "hidden": False,
+                        "shapes": [
                             (
-                                "substrings",
+                                "box",
                                 {
-                                    "type": b"\x63\x6e",
-                                    "substrings": [("any", b"\x66\x72\x65\x64")],
+                                    "corner": {"x": 10, "y": 10},
+                                    "opposite": {"x": 2000, "y": 1200},
+                                    "colour": b"   ",
+                                    "width": 4,
+                                    "dashed": False,
                                 },
                             ),
                             (
-                                "equalityMatch",
-                                {
-                                    "attributeDesc": b"\x64\x6e",
-                                    "assertionValue": b"\x6a\x6f\x65",
-                                },
-                            ),
-                        ],
-                    ),
-                    "attributes": [],
-                },
-            ),
-        }
-
-        encoded = (
-            b"\x30\x33\x02\x01\x02\x63\x2e\x04\x00\x0a\x01\x02\x0a\x01\x00\x02"
-            b"\x01\x00\x02\x01\x00\x01\x01\x00\xa0\x19\xa4\x0c\x04\x02\x63\x6e"
-            b"\x30\x06\x81\x04\x66\x72\x65\x64\xa3\x09\x04\x02\x64\x6e\x04\x03"
-            b"\x6a\x6f\x65\x30\x00"
-        )
-
-        self.assert_encode_decode(rfc4511, "LDAPMessage", decoded, encoded)
-
-        # A search request message with nested filters and controls
-        # (copied from https://github.com/etingof/pyasn1/issues/116).
-        decoded = {
-            "controls": [
-                {
-                    "controlType": b"1.2.840.113556.1.4.319",
-                    "controlValue": b"0\x06\x02\x02\x03\xe7\x04\x00",
-                    "criticality": True,
-                },
-                {"controlType": b"2.16.840.1.113730.3.4.2", "criticality": False},
-            ],
-            "messageID": 5,
-            "protocolOp": (
-                "searchRequest",
-                {
-                    "attributes": [
-                        b"postOfficeBox",
-                        b"givenName",
-                        b"sn",
-                        b"mail",
-                        b"homeDirectory",
-                        b"memberOf",
-                        b"objectGUID",
-                        b"postOfficeBox",
-                        b"extensionAttribute1",
-                        b"mail",
-                        b"sAMAccountName",
-                    ],
-                    "baseObject": b"dc=arl,dc=local",
-                    "derefAliases": "derefAlways",
-                    "filter": (
-                        "and",
-                        [
-                            (
-                                "equalityMatch",
-                                {
-                                    "assertionValue": b"user",
-                                    "attributeDesc": b"objectClass",
-                                },
-                            ),
-                            (
-                                "or",
+                                "group",
                                 [
                                     (
-                                        "equalityMatch",
+                                        "box",
                                         {
-                                            "assertionValue": b"01107ECBA2",
-                                            "attributeDesc": b"postOfficeBox",
+                                            "corner": {"x": 10, "y": 600},
+                                            "opposite": {"x": 900, "y": 1200},
+                                            "colour": b"   ",
+                                            "width": 1,
+                                            "dashed": True,
+                                            "fill": b"\xee\xee\xff",
                                         },
                                     ),
                                     (
-                                        "equalityMatch",
-                                        {
-                                            "assertionValue": b"01107ECBA2",
-                                            "attributeDesc": b"extensionAttribute1",
-                                        },
+                                        "group",
+                                        [
+                                            ("dot", {"x": 455, "y": 900}),
+                                            ("mirrored", ("dot", {"x": 455, "y": 300})),
+                                        ],
                                     ),
                                 ],
                             ),
                         ],
-                    ),
-                    "scope": "wholeSubtree",
-                    "sizeLimit": 0,
-                    "timeLimit": 0,
-                    "typesOnly": False,
-                },
-            ),
+                    },
+                    {
+                        "name": b"notes",
+                        "hidden": True,
+                        "opacity": 75,
+                        "shapes": [
+                            (
+                                "label",
+                                {
+                                    "anchor": {"x": 460, "y": 880},
+                                    "runs": [
+                                        ("bold", b"Kitchen"),
+                                        ("plain", b" (north)"),
+                                        ("glyph", 169),
+                                    ],
+                                    "align": "justified",
+                                },
+                            )
+                        ],
+                    },
+                    {"name": b"scratch", "hidden": False, "shapes": []},
+                ],
+            },
+        )
+
+        encoded = (
+            b"\x61\x81\xbb\x04\x0a\x66\x6c\x6f\x6f\x72\x20\x70\x6c\x61\x6e\x0a"
+            b"\x01\x0a\x30\x81\xa9\x30\x61\x04\x05\x77\x61\x6c\x6c\x73\x30\x58"
+            b"\xa3\x1a\x30\x06\x02\x01\x0a\x02\x01\x0a\x30\x08\x02\x02\x07\xd0"
+            b"\x02\x02\x04\xb0\x47\x03\x20\x20\x20\x02\x01\x04\xa8\x3a\xa3\x20"
+            b"\x30\x07\x02\x01\x0a\x02\x02\x02\x58\x30\x08\x02\x02\x03\x84\x02"
+            b"\x02\x04\xb0\x47\x03\x20\x20\x20\x01\x01\xff\x82\x03\xee\xee\xff"
+            b"\xa8\x16\xa0\x08\x02\x02\x01\xc7\x02\x02\x03\x84\xa9\x0a\xa0\x08"
+            b"\x02\x02\x01\xc7\x02\x02\x01\x2c\x30\x37\x04\x05\x6e\x6f\x74\x65"
+            b"\x73\x80\x01\xff\x81\x01\x4b\x30\x28\xa4\x26\x30\x08\x02\x02\x01"
+            b"\xcc\x02\x02\x03\x70\x30\x17\x81\x07\x4b\x69\x74\x63\x68\x65\x6e"
+            b"\x80\x08\x20\x28\x6e\x6f\x72\x74\x68\x29\x82\x02\x00\xa9\x0a\x01"
+            b"\x05\x30\x0b\x04\x07\x73\x63\x72\x61\x74\x63\x68\x30\x00"
+        )
+
+        self.assert_encode_decode(sketch, "Edit", decoded, encoded)
+
+        # A context tagged sequence with default and optional members
+        # present.
+        decoded = (
+            "addLayer",
+            {
+                "name": b"grid",
+                "hidden": True,
+                "opacity": 40,
+                "shapes": [("dot", {"x": 0, "y": 4096})],
+            },
+        )
+
+        encoded = (
+            b"\xa0\x17\x04\x04\x67\x72\x69\x64\x80\x01\xff\x81\x01\x28\x30\x09"
+            b"\xa0\x07\x02\x01\x00\x02\x02\x10\x00"
+        )
+
+        self.assert_encode_decode(sketch, "Edit", decoded, encoded)
+
+        # A tagged choice in a choice.
+        decoded = (
+            "lock",
+            {
+                "name": b"ink",
+                "hidden": False,
+                "shapes": [
+                    (
+                        "mirrored",
+                        (
+                            "path",
+                            [
+                                {"x": 1, "y": 2},
+                                {"x": 300, "y": 2},
+                                {"x": 300, "y": 150},
+                            ],
+                        ),
+                    )
+                ],
+            },
+        )
+
+        encoded = (
+            b"\xa1\x26\x04\x03\x69\x6e\x6b\x30\x1f\xa9\x1d\xa1\x1b\x30\x06\x02"
+            b"\x01\x01\x02\x01\x02\x30\x07\x02\x02\x01\x2c\x02\x01\x02\x30\x08"
+            b"\x02\x02\x01\x2c\x02\x02\x00\x96"
+        )
+
+        self.assert_encode_decode(sketch, "Edit", decoded, encoded)
+
+        # Application tagged primitive types.
+        decoded = ("paint", b"\xff\x80\x00")
+
+        encoded = b"\x47\x03\xff\x80\x00"
+
+        self.assert_encode_decode(sketch, "Edit", decoded, encoded)
+
+        decoded = ("erase", None)
+
+        encoded = b"\x4c\x00"
+
+        self.assert_encode_decode(sketch, "Edit", decoded, encoded)
+
+        # A member after the extension marker.
+        decoded = ("undo", {"steps": 3, "reason": b"oops"})
+
+        encoded = b"\x7e\x09\x02\x01\x03\x04\x04\x6f\x6f\x70\x73"
+
+        self.assert_encode_decode(sketch, "Edit", decoded, encoded)
+
+        # A sequence of application tagged choice members.
+        decoded = {
+            "revision": 70000,
+            "edits": [
+                ("erase", None),
+                ("paint", b"\x00\x00\x00"),
+                ("undo", {"steps": 1}),
+            ],
         }
 
         encoded = (
-            b"\x30\x82\x01\x49\x02\x01\x05\x63\x81\xff\x04\x0f\x64\x63\x3d\x61"
-            b"\x72\x6c\x2c\x64\x63\x3d\x6c\x6f\x63\x61\x6c\x0a\x01\x02\x0a\x01"
-            b"\x03\x02\x01\x00\x02\x01\x00\x01\x01\x00\xa0\x57\xa3\x13\x04\x0b"
-            b"\x6f\x62\x6a\x65\x63\x74\x43\x6c\x61\x73\x73\x04\x04\x75\x73\x65"
-            b"\x72\xa1\x40\xa3\x1b\x04\x0d\x70\x6f\x73\x74\x4f\x66\x66\x69\x63"
-            b"\x65\x42\x6f\x78\x04\x0a\x30\x31\x31\x30\x37\x45\x43\x42\x41\x32"
-            b"\xa3\x21\x04\x13\x65\x78\x74\x65\x6e\x73\x69\x6f\x6e\x41\x74\x74"
-            b"\x72\x69\x62\x75\x74\x65\x31\x04\x0a\x30\x31\x31\x30\x37\x45\x43"
-            b"\x42\x41\x32\x30\x81\x83\x04\x0d\x70\x6f\x73\x74\x4f\x66\x66\x69"
-            b"\x63\x65\x42\x6f\x78\x04\x09\x67\x69\x76\x65\x6e\x4e\x61\x6d\x65"
-            b"\x04\x02\x73\x6e\x04\x04\x6d\x61\x69\x6c\x04\x0d\x68\x6f\x6d\x65"
-            b"\x44\x69\x72\x65\x63\x74\x6f\x72\x79\x04\x08\x6d\x65\x6d\x62\x65"
-            b"\x72\x4f\x66\x04\x0a\x6f\x62\x6a\x65\x63\x74\x47\x55\x49\x44\x04"
-            b"\x0d\x70\x6f\x73\x74\x4f\x66\x66\x69\x63\x65\x42\x6f\x78\x04\x13"
-            b"\x65\x78\x74\x65\x6e\x73\x69\x6f\x6e\x41\x74\x74\x72\x69\x62\x75"
-            b"\x74\x65\x31\x04\x04\x6d\x61\x69\x6c\x04\x0e\x73\x41\x4d\x41\x63"
-            b"\x63\x6f\x75\x6e\x74\x4e\x61\x6d\x65\xa0\x42\x30\x25\x04\x16\x31"
-            b"\x2e\x32\x2e\x38\x34\x30\x2e\x31\x31\x33\x35\x35\x36\x2e\x31\x2e"
-            b"\x34\x2e\x33\x31\x39\x01\x01\xff\x04\x08\x30\x06\x02\x02\x03\xe7"
-            b"\x04\x00\x30\x19\x04\x17\x32\x2e\x31\x36\x2e\x38\x34\x30\x2e\x31"
-            b"\x2e\x31\x31\x33\x37\x33\x30\x2e\x33\x2e\x34\x2e\x32"
+            b"\x30\x13\x02\x03\x01\x11\x70\x30\x0c\x4c\x00\x47\x03\x00\x00\x00"
+            b"\x7e\x03\x02\x01\x01"
         )
 
-        self.assert_encode_decode(rfc4511, "LDAPMessage", decoded, encoded)
-
-        # A search result done message.
-        decoded = {
-            "messageID": 2,
-            "protocolOp": (
-                "searchResDone",
-                {
-                    "resultCode": "noSuchObject",
-                    "matchedDN": b"",
-                    "diagnosticMessage": b"",
-                },
-            ),
-        }
-
-        encoded = b"\x30\x0c\x02\x01\x02\x65\x07\x0a\x01\x20\x04\x00\x04\x00"
-
-        self.assert_encode_decode(rfc4511, "LDAPMessage", decoded, encoded)
-
-        # A bind request message.
-        decoded = {
-            "messageID": 1,
-            "protocolOp": (
-                "bindRequest",
-                {
-                    "version": 3,
-                    "name": b"uid=tesla,dc=example,dc=com",
-                    "authentication": ("simple", b"password"),
-                },
-            ),
-        }
-
-        encoded = (
-            b"\x30\x2f\x02\x01\x01\x60\x2a\x02\x01\x03\x04\x1b\x75\x69\x64\x3d"
-            b"\x74\x65\x73\x6c\x61\x2c\x64\x63\x3d\x65\x78\x61\x6d\x70\x6c\x65"
-            b"\x2c\x64\x63\x3d\x63\x6f\x6d\x80\x08\x70\x61\x73\x73\x77\x6f\x72"
-            b"\x64"
-        )
-
-        self.assert_encode_decode(rfc4511, "LDAPMessage", decoded, encoded)
-
-        # A bind response message.
-        decoded = {
-            "messageID": 1,
-            "protocolOp": (
-                "bindResponse",
-                {"resultCode": "success", "matchedDN": b"", "diagnosticMessage": b""},
-            ),
-        }
-
-        encoded = b"\x30\x0c\x02\x01\x01\x61\x07\x0a\x01\x00\x04\x00\x04\x00"
-
-        self.assert_encode_decode(rfc4511, "LDAPMessage", decoded, encoded)
+        self.assert_encode_decode(sketch, "Journal", decoded, encoded)
 
     def test_rfc5280(self):
-        rfc5280 = asn1tools.compile_dict(deepcopy(RFC5280))
+        rfc5280 = asn1tools_ext.compile_dict(deepcopy(RFC5280))
 
         decoded = {
             "tbsCertificate": {
@@ -2157,7 +2138,7 @@ class Asn1ToolsBerTest(Asn1ToolsBaseTest):
             },
         }
 
-        rfc5280 = asn1tools.compile_dict(
+        rfc5280 = asn1tools_ext.compile_dict(
             deepcopy(RFC5280_MODIFIED), any_defined_by_choices=any_defined_by_choices
         )
 
@@ -2293,12 +2274,12 @@ class Asn1ToolsBerTest(Asn1ToolsBaseTest):
         self.assert_encode_decode(rfc5280, "ExtendedNetworkAddress", decoded, encoded)
 
     def test_rfc5280_errors(self):
-        rfc5280 = asn1tools.compile_dict(deepcopy(RFC5280))
+        rfc5280 = asn1tools_ext.compile_dict(deepcopy(RFC5280))
 
         # Empty data.
         encoded = b""
 
-        with self.assertRaises(asn1tools.DecodeError) as cm:
+        with self.assertRaises(asn1tools_ext.DecodeError) as cm:
             rfc5280.decode("Certificate", encoded)
 
         self.assertEqual(
@@ -2309,7 +2290,7 @@ class Asn1ToolsBerTest(Asn1ToolsBaseTest):
         # Only tag and length, no contents.
         encoded = b"\x30\x81\x9f"
 
-        with self.assertRaises(asn1tools.DecodeError) as cm:
+        with self.assertRaises(asn1tools_ext.DecodeError) as cm:
             rfc5280.decode("Certificate", encoded)
 
         self.assertEqual(
@@ -2320,7 +2301,7 @@ class Asn1ToolsBerTest(Asn1ToolsBaseTest):
         # Unexpected tag 'ff'.
         encoded = b"\xff\x01\x00"
 
-        with self.assertRaises(asn1tools.DecodeError) as cm:
+        with self.assertRaises(asn1tools_ext.DecodeError) as cm:
             rfc5280.decode("Certificate", encoded)
 
         self.assertEqual(
@@ -2370,7 +2351,7 @@ class Asn1ToolsBerTest(Asn1ToolsBaseTest):
 
         self.assertEqual(encoded[150], 49)
 
-        with self.assertRaises(asn1tools.DecodeError) as cm:
+        with self.assertRaises(asn1tools_ext.DecodeError) as cm:
             rfc5280.decode("Certificate", encoded)
 
         self.assertEqual(
@@ -2380,7 +2361,7 @@ class Asn1ToolsBerTest(Asn1ToolsBaseTest):
         )
 
     def test_all_types(self):
-        all_types = asn1tools.compile_files("tests/files/all_types.asn")
+        all_types = asn1tools_ext.compile_files("tests/files/all_types.asn")
 
         datas = [
             ("Octetstring", b"\x00", b"\x04\x01\x00"),
@@ -2418,7 +2399,9 @@ class Asn1ToolsBerTest(Asn1ToolsBaseTest):
         )
 
     def test_all_types_automatic_tags(self):
-        all_types = asn1tools.compile_files("tests/files/all_types_automatic_tags.asn")
+        all_types = asn1tools_ext.compile_files(
+            "tests/files/all_types_automatic_tags.asn"
+        )
 
         datas = [
             (
@@ -2432,7 +2415,7 @@ class Asn1ToolsBerTest(Asn1ToolsBaseTest):
             self.assert_encode_decode(all_types, type_name, decoded, encoded)
 
     def test_module_tags_explicit(self):
-        all_types = asn1tools.compile_files("tests/files/module_tags_explicit.asn")
+        all_types = asn1tools_ext.compile_files("tests/files/module_tags_explicit.asn")
 
         datas = [
             ("CBA", 1, b"\xa5\x07\xa4\x05\xa3\x03\x02\x01\x01"),
@@ -2466,7 +2449,7 @@ class Asn1ToolsBerTest(Asn1ToolsBaseTest):
             self.assert_encode_decode(all_types, type_name, decoded, encoded)
 
     def test_module_tags_implicit(self):
-        all_types = asn1tools.compile_files("tests/files/module_tags_implicit.asn")
+        all_types = asn1tools_ext.compile_files("tests/files/module_tags_implicit.asn")
 
         datas = [
             ("CBA", 1, b"\x85\x01\x01"),
@@ -2495,7 +2478,7 @@ class Asn1ToolsBerTest(Asn1ToolsBaseTest):
             self.assert_encode_decode(all_types, type_name, decoded, encoded)
 
     def test_module_tags_automatic(self):
-        all_types = asn1tools.compile_files("tests/files/module_tags_automatic.asn")
+        all_types = asn1tools_ext.compile_files("tests/files/module_tags_automatic.asn")
 
         datas = [
             ("CBA", 1, b"\x85\x01\x01"),
@@ -2524,10 +2507,10 @@ class Asn1ToolsBerTest(Asn1ToolsBaseTest):
             self.assert_encode_decode(all_types, type_name, decoded, encoded)
 
     def test_decode_all_types_errors(self):
-        all_types = asn1tools.compile_files("tests/files/all_types.asn")
+        all_types = asn1tools_ext.compile_files("tests/files/all_types.asn")
 
         # BOOLEAN.
-        with self.assertRaises(asn1tools.DecodeError) as cm:
+        with self.assertRaises(asn1tools_ext.DecodeError) as cm:
             all_types.decode("Boolean", b"\xff")
 
         self.assertEqual(
@@ -2535,7 +2518,7 @@ class Asn1ToolsBerTest(Asn1ToolsBaseTest):
             "Boolean: Expected BOOLEAN(Boolean) with tag '01', but got 'ff'. (At offset: 0)",
         )
 
-        with self.assertRaises(asn1tools.DecodeError) as cm:
+        with self.assertRaises(asn1tools_ext.DecodeError) as cm:
             all_types.decode("Boolean", b"\x01\x02\x01\x01")
 
         self.assertEqual(
@@ -2544,7 +2527,7 @@ class Asn1ToolsBerTest(Asn1ToolsBaseTest):
         )
 
         # INTEGER.
-        with self.assertRaises(asn1tools.DecodeError) as cm:
+        with self.assertRaises(asn1tools_ext.DecodeError) as cm:
             all_types.decode("Integer", b"\xfe")
 
         self.assertEqual(
@@ -2553,7 +2536,7 @@ class Asn1ToolsBerTest(Asn1ToolsBaseTest):
         )
 
         # BIT STRING.
-        with self.assertRaises(asn1tools.DecodeError) as cm:
+        with self.assertRaises(asn1tools_ext.DecodeError) as cm:
             all_types.decode("Bitstring", b"\xfd")
 
         self.assertEqual(
@@ -2562,7 +2545,7 @@ class Asn1ToolsBerTest(Asn1ToolsBaseTest):
         )
 
         # OCTET STRING.
-        with self.assertRaises(asn1tools.DecodeError) as cm:
+        with self.assertRaises(asn1tools_ext.DecodeError) as cm:
             all_types.decode("Octetstring", b"\xfc")
 
         self.assertEqual(
@@ -2571,7 +2554,7 @@ class Asn1ToolsBerTest(Asn1ToolsBaseTest):
         )
 
         # NULL.
-        with self.assertRaises(asn1tools.DecodeError) as cm:
+        with self.assertRaises(asn1tools_ext.DecodeError) as cm:
             all_types.decode("Null", b"\xfb")
 
         self.assertEqual(
@@ -2580,7 +2563,7 @@ class Asn1ToolsBerTest(Asn1ToolsBaseTest):
         )
 
         # OBJECT IDENTIFIER.
-        with self.assertRaises(asn1tools.DecodeError) as cm:
+        with self.assertRaises(asn1tools_ext.DecodeError) as cm:
             all_types.decode("Objectidentifier", b"\xfa")
 
         self.assertEqual(
@@ -2590,7 +2573,7 @@ class Asn1ToolsBerTest(Asn1ToolsBaseTest):
         )
 
         # ENUMERATED.
-        with self.assertRaises(asn1tools.DecodeError) as cm:
+        with self.assertRaises(asn1tools_ext.DecodeError) as cm:
             all_types.decode("Enumerated", b"\xf9")
 
         self.assertEqual(
@@ -2599,7 +2582,7 @@ class Asn1ToolsBerTest(Asn1ToolsBaseTest):
         )
 
         # UTF8String.
-        with self.assertRaises(asn1tools.DecodeError) as cm:
+        with self.assertRaises(asn1tools_ext.DecodeError) as cm:
             all_types.decode("Utf8string", b"\xf8")
 
         self.assertEqual(
@@ -2608,7 +2591,7 @@ class Asn1ToolsBerTest(Asn1ToolsBaseTest):
         )
 
         # SEQUENCE.
-        with self.assertRaises(asn1tools.DecodeError) as cm:
+        with self.assertRaises(asn1tools_ext.DecodeError) as cm:
             all_types.decode("Sequence", b"\xf7")
 
         self.assertEqual(
@@ -2617,7 +2600,7 @@ class Asn1ToolsBerTest(Asn1ToolsBaseTest):
         )
 
         # SET.
-        with self.assertRaises(asn1tools.DecodeError) as cm:
+        with self.assertRaises(asn1tools_ext.DecodeError) as cm:
             all_types.decode("Set", b"\xf6")
 
         self.assertEqual(
@@ -2626,7 +2609,7 @@ class Asn1ToolsBerTest(Asn1ToolsBaseTest):
         )
 
         # NumericString.
-        with self.assertRaises(asn1tools.DecodeError) as cm:
+        with self.assertRaises(asn1tools_ext.DecodeError) as cm:
             all_types.decode("Numericstring", b"\xf5")
 
         self.assertEqual(
@@ -2636,7 +2619,7 @@ class Asn1ToolsBerTest(Asn1ToolsBaseTest):
         )
 
         # PrintableString.
-        with self.assertRaises(asn1tools.DecodeError) as cm:
+        with self.assertRaises(asn1tools_ext.DecodeError) as cm:
             all_types.decode("Printablestring", b"\xf4")
 
         self.assertEqual(
@@ -2646,7 +2629,7 @@ class Asn1ToolsBerTest(Asn1ToolsBaseTest):
         )
 
         # IA5String.
-        with self.assertRaises(asn1tools.DecodeError) as cm:
+        with self.assertRaises(asn1tools_ext.DecodeError) as cm:
             all_types.decode("Ia5string", b"\xf3")
 
         self.assertEqual(
@@ -2655,7 +2638,7 @@ class Asn1ToolsBerTest(Asn1ToolsBaseTest):
         )
 
         # UniversalString.
-        with self.assertRaises(asn1tools.DecodeError) as cm:
+        with self.assertRaises(asn1tools_ext.DecodeError) as cm:
             all_types.decode("Universalstring", b"\xf2")
 
         self.assertEqual(
@@ -2664,7 +2647,7 @@ class Asn1ToolsBerTest(Asn1ToolsBaseTest):
         )
 
         # VisibleString.
-        with self.assertRaises(asn1tools.DecodeError) as cm:
+        with self.assertRaises(asn1tools_ext.DecodeError) as cm:
             all_types.decode("Visiblestring", b"\xf1")
 
         self.assertEqual(
@@ -2673,7 +2656,7 @@ class Asn1ToolsBerTest(Asn1ToolsBaseTest):
         )
 
         # GeneralString.
-        with self.assertRaises(asn1tools.DecodeError) as cm:
+        with self.assertRaises(asn1tools_ext.DecodeError) as cm:
             all_types.decode("Generalstring", b"\xf1")
 
         self.assertEqual(
@@ -2682,7 +2665,7 @@ class Asn1ToolsBerTest(Asn1ToolsBaseTest):
         )
 
         # BMPString.
-        with self.assertRaises(asn1tools.DecodeError) as cm:
+        with self.assertRaises(asn1tools_ext.DecodeError) as cm:
             all_types.decode("Bmpstring", b"\xf0")
 
         self.assertEqual(
@@ -2691,7 +2674,7 @@ class Asn1ToolsBerTest(Asn1ToolsBaseTest):
         )
 
         # TeletexString.
-        with self.assertRaises(asn1tools.DecodeError) as cm:
+        with self.assertRaises(asn1tools_ext.DecodeError) as cm:
             all_types.decode("Teletexstring", b"\xef")
 
         self.assertEqual(
@@ -2700,7 +2683,7 @@ class Asn1ToolsBerTest(Asn1ToolsBaseTest):
         )
 
         # UTCTime.
-        with self.assertRaises(asn1tools.DecodeError) as cm:
+        with self.assertRaises(asn1tools_ext.DecodeError) as cm:
             all_types.decode("Utctime", b"\xee")
 
         self.assertEqual(
@@ -2709,7 +2692,7 @@ class Asn1ToolsBerTest(Asn1ToolsBaseTest):
         )
 
         # SequenceOf.
-        with self.assertRaises(asn1tools.DecodeError) as cm:
+        with self.assertRaises(asn1tools_ext.DecodeError) as cm:
             all_types.decode("SequenceOf", b"\xed")
 
         self.assertEqual(
@@ -2718,7 +2701,7 @@ class Asn1ToolsBerTest(Asn1ToolsBaseTest):
         )
 
         # SetOf.
-        with self.assertRaises(asn1tools.DecodeError) as cm:
+        with self.assertRaises(asn1tools_ext.DecodeError) as cm:
             all_types.decode("SetOf", b"\xec")
 
         self.assertEqual(
@@ -2727,7 +2710,7 @@ class Asn1ToolsBerTest(Asn1ToolsBaseTest):
         )
 
     def test_repr_all_types(self):
-        all_types = asn1tools.compile_files("tests/files/all_types.asn")
+        all_types = asn1tools_ext.compile_files("tests/files/all_types.asn")
 
         self.assertEqual(repr(all_types.types["Boolean"]), "Boolean(Boolean)")
         self.assertEqual(repr(all_types.types["Integer"]), "Integer(Integer)")
@@ -2794,7 +2777,7 @@ class Asn1ToolsBerTest(Asn1ToolsBaseTest):
         """Test explicit tags on UTC time."""
 
         spec = "Foo DEFINITIONS ::= BEGIN Foo ::= [2] UTF8String END"
-        foo = asn1tools.compile_string(spec)
+        foo = asn1tools_ext.compile_string(spec)
         self.assert_encode_decode(foo, "Foo", "foo", b"\xa2\x05\x0c\x03foo")
 
     def test_nested_explicit_tags(self):
@@ -2829,13 +2812,13 @@ class Asn1ToolsBerTest(Asn1ToolsBaseTest):
             b"\x05\xb5\x03\x02\x01\x2a"
         )
 
-        testcase = asn1tools.compile_string(spec)
+        testcase = asn1tools_ext.compile_string(spec)
         self.assert_encode_decode(testcase, "OUTER", decoded, encoded)
 
     def test_zforce(self):
         """ """
 
-        zforce = asn1tools.compile_dict(deepcopy(ZFORCE))
+        zforce = asn1tools_ext.compile_dict(deepcopy(ZFORCE))
 
         # PDU 1.
         decoded = ("request", {"deviceAddress": b"\x00\x01"})
@@ -2905,7 +2888,7 @@ class Asn1ToolsBerTest(Asn1ToolsBaseTest):
     def test_bar(self):
         """A simple example."""
 
-        bar = asn1tools.compile_files("tests/files/bar.asn")
+        bar = asn1tools_ext.compile_files("tests/files/bar.asn")
 
         # Message 1.
         decoded = {
@@ -2944,7 +2927,7 @@ class Asn1ToolsBerTest(Asn1ToolsBaseTest):
 
         any_defined_by_choices = {("Foo", "Fie", "fum"): {0: "NULL", 1: "INTEGER"}}
 
-        foo = asn1tools.compile_string(
+        foo = asn1tools_ext.compile_string(
             spec, any_defined_by_choices=any_defined_by_choices
         )
 
@@ -2967,12 +2950,12 @@ class Asn1ToolsBerTest(Asn1ToolsBaseTest):
 
         encoded = b"\x30\x06\x02\x01\x02\x02\x01\x05"
 
-        with self.assertRaises(asn1tools.EncodeError) as cm:
+        with self.assertRaises(asn1tools_ext.EncodeError) as cm:
             foo.encode("Fie", decoded)
 
         self.assertEqual(str(cm.exception), "Fie.fum: Bad AnyDefinedBy choice 2.")
 
-        with self.assertRaises(asn1tools.DecodeError) as cm:
+        with self.assertRaises(asn1tools_ext.DecodeError) as cm:
             decoded = foo.decode("Fie", encoded)
 
         self.assertEqual(
@@ -2995,7 +2978,7 @@ class Asn1ToolsBerTest(Asn1ToolsBaseTest):
             ("Foo", "Fie", "fum"): {"1.3.6.2": "IA5String", "1.3.1000.7": "BOOLEAN"}
         }
 
-        foo = asn1tools.compile_string(
+        foo = asn1tools_ext.compile_string(
             spec, any_defined_by_choices=any_defined_by_choices
         )
 
@@ -3018,14 +3001,14 @@ class Asn1ToolsBerTest(Asn1ToolsBaseTest):
 
         encoded = b"0\t\x06\x04+\x87h\x08\x01\x01\x01"
 
-        with self.assertRaises(asn1tools.EncodeError) as cm:
+        with self.assertRaises(asn1tools_ext.EncodeError) as cm:
             foo.encode("Fie", decoded)
 
         self.assertEqual(
             str(cm.exception), "Fie.fum: Bad AnyDefinedBy choice 1.3.1000.8."
         )
 
-        with self.assertRaises(asn1tools.DecodeError) as cm:
+        with self.assertRaises(asn1tools_ext.DecodeError) as cm:
             decoded = foo.decode("Fie", encoded)
 
         self.assertEqual(
@@ -3034,7 +3017,7 @@ class Asn1ToolsBerTest(Asn1ToolsBaseTest):
         )
 
     def test_decode_bad_length(self):
-        foo = asn1tools.compile_files("tests/files/foo.asn")
+        foo = asn1tools_ext.compile_files("tests/files/foo.asn")
 
         datas = [
             (
@@ -3056,13 +3039,13 @@ class Asn1ToolsBerTest(Asn1ToolsBaseTest):
         ]
 
         for encoded, message in datas:
-            with self.assertRaises(asn1tools.DecodeError) as cm:
+            with self.assertRaises(asn1tools_ext.DecodeError) as cm:
                 foo.decode("Question", encoded)
 
             self.assertEqual(str(cm.exception), message)
 
     def test_all_types_constructed_definite_length(self):
-        all_types = asn1tools.compile_files("tests/files/all_types.asn")
+        all_types = asn1tools_ext.compile_files("tests/files/all_types.asn")
 
         datas = [
             ("Bitstring", (b"\x80", 1), b"\x03\x02\x07\x80"),
@@ -3086,7 +3069,7 @@ class Asn1ToolsBerTest(Asn1ToolsBaseTest):
             self.assertEqual(all_types.decode(type_name, encoded), decoded)
 
     def test_all_types_constructed_indefinite_length(self):
-        all_types = asn1tools.compile_files("tests/files/all_types.asn")
+        all_types = asn1tools_ext.compile_files("tests/files/all_types.asn")
 
         datas = [
             (
@@ -3132,11 +3115,11 @@ class Asn1ToolsBerTest(Asn1ToolsBaseTest):
         """
 
         spec = "A DEFINITIONS ::= BEGIN A ::= BOOLEAN END"
-        foo = asn1tools.compile_string(spec)
+        foo = asn1tools_ext.compile_string(spec)
 
         encoded = b"\x01\x80\xff"
 
-        with self.assertRaises(asn1tools.DecodeError) as cm:
+        with self.assertRaises(asn1tools_ext.DecodeError) as cm:
             foo.decode("A", encoded)
 
         self.assertEqual(
@@ -3145,7 +3128,7 @@ class Asn1ToolsBerTest(Asn1ToolsBaseTest):
         )
 
     def test_versions(self):
-        foo = asn1tools.compile_files("tests/files/versions.asn")
+        foo = asn1tools_ext.compile_files("tests/files/versions.asn")
 
         # Encode as V1, decode as V1, V2 and V3
         decoded_v1 = {
@@ -3191,7 +3174,7 @@ class Asn1ToolsBerTest(Asn1ToolsBaseTest):
         self.assertEqual(foo.decode("V3", encoded_v3), decoded_v3)
 
     def test_long_tag(self):
-        foo = asn1tools.compile_string(
+        foo = asn1tools_ext.compile_string(
             "Foo DEFINITIONS IMPLICIT TAGS ::= BEGIN "
             "A ::= [31] INTEGER "
             "B ::= [500] INTEGER "
@@ -3209,7 +3192,7 @@ class Asn1ToolsBerTest(Asn1ToolsBaseTest):
 
         """
 
-        foo = asn1tools.compile_string(
+        foo = asn1tools_ext.compile_string(
             "Foo DEFINITIONS AUTOMATIC TAGS ::= BEGIN "
             "A ::= SEQUENCE { "
             "  a B "
@@ -3226,7 +3209,7 @@ class Asn1ToolsBerTest(Asn1ToolsBaseTest):
         self.assert_encode_decode(foo, "A", decoded, encoded)
 
     def test_decode_with_length(self):
-        foo = asn1tools.compile_string(
+        foo = asn1tools_ext.compile_string(
             "Foo DEFINITIONS IMPLICIT TAGS ::= "
             "BEGIN "
             "A ::= INTEGER "

@@ -3,7 +3,7 @@
 import functools
 import asyncio
 import websockets
-import asn1tools
+import asn1tools_ext
 
 
 async def echo(websocket, _, c_source):
@@ -17,7 +17,7 @@ async def echo(websocket, _, c_source):
 
 
 def main():
-    c_source = asn1tools.compile_files(
+    c_source = asn1tools_ext.compile_files(
         ["asn1/c_source.asn", "asn1/programming_types.asn"], "oer"
     )
 

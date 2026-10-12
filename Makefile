@@ -123,21 +123,20 @@ CFLAGS_EXTRA_CLANG := \
 
 .PHONY: test
 test:
-	python3 setup.py test
+	python3 -m unittest
 	$(MAKE) test-sdist
-	env PYTHONPATH=. python3 examples/benchmarks/packages/ber.py
-	env PYTHONPATH=. python3 examples/benchmarks/packages/uper.py
-	env PYTHONPATH=. python3 examples/benchmarks/codecs.py
-	env PYTHONPATH=. python3 examples/benchmarks/compile_methods.py
-	env PYTHONPATH=. python3 examples/benchmarks/question/question.py
-	env PYTHONPATH=. python3 examples/hello_world.py
-	env PYTHONPATH=. python3 examples/x509_pem.py
-	env PYTHONPATH=. python3 examples/compact_extensions_uper/main.py
-	env PYTHONPATH=. python3 examples/programming_types/main.py
+	env PYTHONPATH=src python3 examples/benchmarks/packages/ber.py
+	env PYTHONPATH=src python3 examples/benchmarks/packages/uper.py
+	env PYTHONPATH=src python3 examples/benchmarks/codecs.py
+	env PYTHONPATH=src python3 examples/benchmarks/compile_methods.py
+	env PYTHONPATH=src python3 examples/benchmarks/question/question.py
+	env PYTHONPATH=src python3 examples/hello_world.py
+	env PYTHONPATH=src python3 examples/x509_pem.py
+	env PYTHONPATH=src python3 examples/compact_extensions_uper/main.py
+	env PYTHONPATH=src python3 examples/programming_types/main.py
 	$(MAKE) test-c
 	env FUZZER_EXECUTION_TIME=1 $(MAKE) test-c-fuzzer
 	$(MAKE) -C examples/benchmarks/c_source
-	python3 -m pycodestyle $$(git ls-files "asn1tools/*.py")
 
 .PHONY: codespell
 codespell:
@@ -145,7 +144,7 @@ codespell:
 				     | grep -v 3gpp \
 				     | grep -v generated \
 				     | grep -v "\\.rs" \
-				     | grep -v asn1tools/source/rust \
+				     | grep -v asn1tools_ext/source/rust \
 				     | grep -v "\.asn")
 
 .PHONY: test-c
@@ -205,16 +204,16 @@ test-rust:
 .PHONY: test-sdist
 test-sdist:
 	rm -rf dist
-	python3 setup.py sdist
+	uv build --sdist
 	cd dist && \
 	mkdir test && \
 	cd test && \
 	tar xf ../*.tar.gz && \
-	cd asn1tools-* && \
-	python3 setup.py test
+	cd asn1tools_ext-* && \
+	env PYTHONPATH=src python3 -c "import asn1tools_ext"
 
 .PHONY: release-to-pypi
 release-to-pypi:
-	python3 setup.py sdist
-	python3 setup.py bdist_wheel --universal
+	rm -rf dist
+	uv build
 	twine upload dist/*

@@ -27,7 +27,7 @@ from __future__ import print_function
 
 import os
 import timeit
-import asn1tools
+import asn1tools_ext
 
 SCRIPT_DIR = os.path.dirname(os.path.realpath(__file__))
 RRC_8_6_0_ASN_PATH = os.path.join(
@@ -454,7 +454,7 @@ ITERATIONS = 3000
 
 
 def asn1tools_encode_decode():
-    rrc = asn1tools.compile_files(RRC_8_6_0_ASN_PATH, "uper")
+    rrc = asn1tools_ext.compile_files(RRC_8_6_0_ASN_PATH, "uper")
 
     def encode():
         rrc.encode("BCCH-DL-SCH-Message", DECODED_MESSAGE_ASN1TOOLS, check_types=False)

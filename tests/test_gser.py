@@ -5,24 +5,24 @@ import unittest
 from .utils import Asn1ToolsBaseTest
 import sys
 from copy import deepcopy
-from asn1tools.codecs import utc_time_to_datetime as ut2dt
-from asn1tools.codecs import generalized_time_to_datetime as gt2dt
+from asn1tools_ext.codecs import utc_time_to_datetime as ut2dt
+from asn1tools_ext.codecs import generalized_time_to_datetime as gt2dt
 
-import asn1tools
+import asn1tools_ext
 
 sys.path.append("tests/files")
 sys.path.append("tests/files/3gpp")
 sys.path.append("tests/files/ietf")
 
 from rrc_8_6_0 import EXPECTED as RRC_8_6_0
-from rfc4511 import EXPECTED as RFC4511
+from sketch import EXPECTED as SKETCH
 
 
 class Asn1ToolsGserTest(Asn1ToolsBaseTest):
     maxDiff = None
 
     def test_external(self):
-        foo = asn1tools.compile_string(
+        foo = asn1tools_ext.compile_string(
             "Foo DEFINITIONS AUTOMATIC TAGS ::= BEGIN A ::= EXTERNAL END", "gser"
         )
 
@@ -38,7 +38,7 @@ class Asn1ToolsGserTest(Asn1ToolsBaseTest):
             self.assertEqual(foo.encode(name, decoded), encoded)
 
     def test_real(self):
-        foo = asn1tools.compile_string(
+        foo = asn1tools_ext.compile_string(
             "Foo DEFINITIONS AUTOMATIC TAGS ::= BEGIN A ::= REAL END", "gser"
         )
 
@@ -57,7 +57,7 @@ class Asn1ToolsGserTest(Asn1ToolsBaseTest):
             self.assertEqual(foo.encode(name, decoded), encoded)
 
     def test_null(self):
-        foo = asn1tools.compile_string(
+        foo = asn1tools_ext.compile_string(
             "Foo DEFINITIONS AUTOMATIC TAGS ::= BEGIN A ::= NULL END", "gser"
         )
 
@@ -67,7 +67,7 @@ class Asn1ToolsGserTest(Asn1ToolsBaseTest):
         self.assertEqual(foo.encode("A", decoded), encoded)
 
     def test_octet_string(self):
-        foo = asn1tools.compile_string(
+        foo = asn1tools_ext.compile_string(
             "Foo DEFINITIONS AUTOMATIC TAGS ::= BEGIN A ::= OCTET STRING END", "gser"
         )
 
@@ -79,7 +79,7 @@ class Asn1ToolsGserTest(Asn1ToolsBaseTest):
             self.assertEqual(foo.encode(name, decoded), encoded)
 
     def test_sequence(self):
-        foo = asn1tools.compile_string(
+        foo = asn1tools_ext.compile_string(
             "Foo DEFINITIONS AUTOMATIC TAGS ::= "
             "BEGIN "
             "A ::= SEQUENCE { "
@@ -103,13 +103,13 @@ class Asn1ToolsGserTest(Asn1ToolsBaseTest):
             self.assertEqual(foo.encode(name, decoded), encoded)
 
         # Missing member.
-        with self.assertRaises(asn1tools.EncodeError) as cm:
+        with self.assertRaises(asn1tools_ext.EncodeError) as cm:
             foo.encode("A", {})
 
         self.assertEqual(str(cm.exception), "A: Sequence member 'a' not found in {}.")
 
     def test_sequence_of(self):
-        foo = asn1tools.compile_string(
+        foo = asn1tools_ext.compile_string(
             "Foo DEFINITIONS AUTOMATIC TAGS ::= BEGIN A ::= SEQUENCE OF INTEGER END",
             "gser",
         )
@@ -124,7 +124,7 @@ class Asn1ToolsGserTest(Asn1ToolsBaseTest):
             self.assertEqual(foo.encode(name, decoded), encoded)
 
     def test_set(self):
-        foo = asn1tools.compile_string(
+        foo = asn1tools_ext.compile_string(
             "Foo DEFINITIONS AUTOMATIC TAGS ::= "
             "BEGIN "
             "A ::= SET { "
@@ -148,13 +148,13 @@ class Asn1ToolsGserTest(Asn1ToolsBaseTest):
             self.assertEqual(foo.encode(name, decoded), encoded)
 
         # Missing member.
-        with self.assertRaises(asn1tools.EncodeError) as cm:
+        with self.assertRaises(asn1tools_ext.EncodeError) as cm:
             foo.encode("A", {})
 
         self.assertEqual(str(cm.exception), "A: Set member 'a' not found in {}.")
 
     def test_set_of(self):
-        foo = asn1tools.compile_string(
+        foo = asn1tools_ext.compile_string(
             "Foo DEFINITIONS AUTOMATIC TAGS ::= BEGIN A ::= SET OF INTEGER END", "gser"
         )
 
@@ -168,19 +168,19 @@ class Asn1ToolsGserTest(Asn1ToolsBaseTest):
             self.assertEqual(foo.encode(name, decoded), encoded)
 
     def test_choice(self):
-        foo = asn1tools.compile_string(
+        foo = asn1tools_ext.compile_string(
             "Foo DEFINITIONS AUTOMATIC TAGS ::= BEGIN A ::= CHOICE {   a NULL } END",
             "gser",
         )
 
         # Bad choice.
-        with self.assertRaises(asn1tools.EncodeError) as cm:
+        with self.assertRaises(asn1tools_ext.EncodeError) as cm:
             foo.encode("A", ("b", None))
 
         self.assertEqual(str(cm.exception), "A: Expected choice 'a', but got 'b'.")
 
     def test_utf8_string(self):
-        foo = asn1tools.compile_string(
+        foo = asn1tools_ext.compile_string(
             "Foo DEFINITIONS AUTOMATIC TAGS ::= BEGIN A ::= UTF8String END", "gser"
         )
 
@@ -190,7 +190,7 @@ class Asn1ToolsGserTest(Asn1ToolsBaseTest):
             self.assertEqual(foo.encode(name, decoded), encoded)
 
     def test_numeric_string(self):
-        foo = asn1tools.compile_string(
+        foo = asn1tools_ext.compile_string(
             "Foo DEFINITIONS AUTOMATIC TAGS ::= BEGIN A ::= NumericString END", "gser"
         )
 
@@ -200,7 +200,7 @@ class Asn1ToolsGserTest(Asn1ToolsBaseTest):
         self.assertEqual(foo.encode("A", decoded), encoded)
 
     def test_printable_string(self):
-        foo = asn1tools.compile_string(
+        foo = asn1tools_ext.compile_string(
             "Foo DEFINITIONS AUTOMATIC TAGS ::= BEGIN A ::= PrintableString END", "gser"
         )
 
@@ -210,7 +210,7 @@ class Asn1ToolsGserTest(Asn1ToolsBaseTest):
         self.assertEqual(foo.encode("A", decoded), encoded)
 
     def test_visible_string(self):
-        foo = asn1tools.compile_string(
+        foo = asn1tools_ext.compile_string(
             "Foo DEFINITIONS AUTOMATIC TAGS ::= BEGIN A ::= VisibleString END", "gser"
         )
 
@@ -220,7 +220,7 @@ class Asn1ToolsGserTest(Asn1ToolsBaseTest):
         self.assertEqual(foo.encode("A", decoded), encoded)
 
     def test_general_string(self):
-        foo = asn1tools.compile_string(
+        foo = asn1tools_ext.compile_string(
             "Foo DEFINITIONS AUTOMATIC TAGS ::= BEGIN A ::= GeneralString END", "gser"
         )
 
@@ -230,7 +230,7 @@ class Asn1ToolsGserTest(Asn1ToolsBaseTest):
         self.assertEqual(foo.encode("A", decoded), encoded)
 
     def test_bmp_string(self):
-        foo = asn1tools.compile_string(
+        foo = asn1tools_ext.compile_string(
             "Foo DEFINITIONS AUTOMATIC TAGS ::= BEGIN A ::= BMPString END", "gser"
         )
 
@@ -240,7 +240,7 @@ class Asn1ToolsGserTest(Asn1ToolsBaseTest):
             self.assertEqual(foo.encode(name, decoded), encoded)
 
     def test_graphic_string(self):
-        foo = asn1tools.compile_string(
+        foo = asn1tools_ext.compile_string(
             "Foo DEFINITIONS AUTOMATIC TAGS ::= BEGIN A ::= GraphicString END", "gser"
         )
 
@@ -250,7 +250,7 @@ class Asn1ToolsGserTest(Asn1ToolsBaseTest):
         self.assertEqual(foo.encode("A", decoded), encoded)
 
     def test_teletex_string(self):
-        foo = asn1tools.compile_string(
+        foo = asn1tools_ext.compile_string(
             "Foo DEFINITIONS AUTOMATIC TAGS ::= BEGIN A ::= TeletexString END", "gser"
         )
 
@@ -260,7 +260,7 @@ class Asn1ToolsGserTest(Asn1ToolsBaseTest):
         self.assertEqual(foo.encode("A", decoded), encoded)
 
     def test_universal_string(self):
-        foo = asn1tools.compile_string(
+        foo = asn1tools_ext.compile_string(
             "Foo DEFINITIONS AUTOMATIC TAGS ::= BEGIN A ::= UniversalString END", "gser"
         )
 
@@ -270,7 +270,7 @@ class Asn1ToolsGserTest(Asn1ToolsBaseTest):
             self.assertEqual(foo.encode(type_name, decoded), encoded)
 
     def test_utc_time(self):
-        foo = asn1tools.compile_string(
+        foo = asn1tools_ext.compile_string(
             "Foo DEFINITIONS AUTOMATIC TAGS ::= BEGIN A ::= UTCTime END", "gser"
         )
 
@@ -280,7 +280,7 @@ class Asn1ToolsGserTest(Asn1ToolsBaseTest):
         self.assertEqual(foo.encode("A", decoded), encoded)
 
     def test_generalized_time(self):
-        foo = asn1tools.compile_string(
+        foo = asn1tools_ext.compile_string(
             "Foo DEFINITIONS AUTOMATIC TAGS ::= BEGIN A ::= GeneralizedTime END", "gser"
         )
 
@@ -290,7 +290,7 @@ class Asn1ToolsGserTest(Asn1ToolsBaseTest):
         self.assertEqual(foo.encode("A", decoded), encoded)
 
     def test_any(self):
-        foo = asn1tools.compile_string(
+        foo = asn1tools_ext.compile_string(
             "Foo DEFINITIONS AUTOMATIC TAGS ::= BEGIN A ::= ANY END", "gser"
         )
 
@@ -303,7 +303,7 @@ class Asn1ToolsGserTest(Asn1ToolsBaseTest):
             self.assertEqual(foo.encode(name, decoded), encoded)
 
     def test_foo(self):
-        foo = asn1tools.compile_files(["tests/files/foo.asn"], "gser")
+        foo = asn1tools_ext.compile_files(["tests/files/foo.asn"], "gser")
 
         datas = [
             (
@@ -317,7 +317,7 @@ class Asn1ToolsGserTest(Asn1ToolsBaseTest):
             self.assertEqual(foo.encode(name, decoded), encoded)
 
     def test_foo_indent(self):
-        foo = asn1tools.compile_files(["tests/files/foo.asn"], "gser")
+        foo = asn1tools_ext.compile_files(["tests/files/foo.asn"], "gser")
 
         datas = [
             (
@@ -332,7 +332,7 @@ class Asn1ToolsGserTest(Asn1ToolsBaseTest):
             self.assertEqual(actual, encoded)
 
     def test_rrc_8_6_0(self):
-        rrc = asn1tools.compile_dict(deepcopy(RRC_8_6_0), "gser")
+        rrc = asn1tools_ext.compile_dict(deepcopy(RRC_8_6_0), "gser")
 
         decoded = {
             "message": (
@@ -734,7 +734,7 @@ class Asn1ToolsGserTest(Asn1ToolsBaseTest):
         self.assertEqual(rrc.encode("BCCH-DL-SCH-Message", decoded, indent=2), encoded)
 
     def test_repr_all_types(self):
-        all_types = asn1tools.compile_files("tests/files/all_types.asn", "gser")
+        all_types = asn1tools_ext.compile_files("tests/files/all_types.asn", "gser")
 
         self.assertEqual(repr(all_types.types["Boolean"]), "Boolean(Boolean)")
         self.assertEqual(repr(all_types.types["Integer"]), "Integer(Integer)")
@@ -797,77 +797,58 @@ class Asn1ToolsGserTest(Asn1ToolsBaseTest):
             "Sequence(Sequence12, [SequenceOf(a, Recursive(Sequence12))])",
         )
 
-    def test_rfc4511(self):
-        rfc4511 = asn1tools.compile_dict(deepcopy(RFC4511), "gser")
+    def test_sketch(self):
+        sketch = asn1tools_ext.compile_dict(deepcopy(SKETCH), "gser")
 
-        # A search request message.
-        decoded = {
-            "messageID": 2,
-            "protocolOp": (
-                "searchRequest",
-                {
-                    "baseObject": b"",
-                    "scope": "wholeSubtree",
-                    "derefAliases": "neverDerefAliases",
-                    "sizeLimit": 0,
-                    "timeLimit": 0,
-                    "typesOnly": False,
-                    "filter": (
-                        "and",
-                        [
-                            (
-                                "substrings",
-                                {
-                                    "type": b"\x63\x6e",
-                                    "substrings": [("any", b"\x66\x72\x65\x64")],
-                                },
-                            ),
-                            (
-                                "equalityMatch",
-                                {
-                                    "attributeDesc": b"\x64\x6e",
-                                    "assertionValue": b"\x6a\x6f\x65",
-                                },
-                            ),
-                        ],
-                    ),
-                    "attributes": [],
-                },
-            ),
-        }
+        # A locked layer with a mirrored path.
+        decoded = (
+            "lock",
+            {
+                "name": b"ink",
+                "hidden": False,
+                "shapes": [
+                    (
+                        "mirrored",
+                        (
+                            "path",
+                            [
+                                {"x": 1, "y": 2},
+                                {"x": 300, "y": 2},
+                                {"x": 300, "y": 150},
+                            ],
+                        ),
+                    )
+                ],
+            },
+        )
 
         encoded = (
-            b"ldapmessage LDAPMessage ::= {\n"
-            b"  messageID 2,\n"
-            b"  protocolOp searchRequest : {\n"
-            b"    baseObject ''H,\n"
-            b"    scope wholeSubtree,\n"
-            b"    derefAliases neverDerefAliases,\n"
-            b"    sizeLimit 0,\n"
-            b"    timeLimit 0,\n"
-            b"    typesOnly FALSE,\n"
-            b"    filter and : {\n"
-            b"      substrings : {\n"
-            b"        type '636E'H,\n"
-            b"        substrings {\n"
-            b"          any : '66726564'H\n"
-            b"        }\n"
+            b"edit Edit ::= lock : {\n"
+            b"  name '696E6B'H,\n"
+            b"  hidden FALSE,\n"
+            b"  shapes {\n"
+            b"    mirrored : path : {\n"
+            b"      {\n"
+            b"        x 1,\n"
+            b"        y 2\n"
             b"      },\n"
-            b"      equalityMatch : {\n"
-            b"        attributeDesc '646E'H,\n"
-            b"        assertionValue '6A6F65'H\n"
+            b"      {\n"
+            b"        x 300,\n"
+            b"        y 2\n"
+            b"      },\n"
+            b"      {\n"
+            b"        x 300,\n"
+            b"        y 150\n"
             b"      }\n"
-            b"    },\n"
-            b"    attributes {\n"
             b"    }\n"
             b"  }\n"
             b"}"
         )
 
-        self.assertEqual(rfc4511.encode("LDAPMessage", decoded, indent=2), encoded)
+        self.assertEqual(sketch.encode("Edit", decoded, indent=2), encoded)
 
     def test_not_support_decode_with_length(self):
-        foo = asn1tools.compile_string(
+        foo = asn1tools_ext.compile_string(
             "Foo DEFINITIONS AUTOMATIC TAGS ::= BEGIN A ::= OCTET STRING END", "gser"
         )
 

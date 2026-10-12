@@ -5,7 +5,7 @@
 from __future__ import print_function
 import os
 import base64
-import asn1tools
+import asn1tools_ext
 
 
 SCRIPT_DIR = os.path.dirname(os.path.realpath(__file__))
@@ -39,8 +39,8 @@ certificate = CERTIFICATE_PEM.splitlines()[1:-1]
 certificate = "".join(certificate)
 certificate = base64.b64decode(certificate)
 
-rfc5280_der = asn1tools.compile_files(RFC5280_ASN_PATH, codec="der")
-rfc5280_gser = asn1tools.compile_files(RFC5280_ASN_PATH, codec="gser")
+rfc5280_der = asn1tools_ext.compile_files(RFC5280_ASN_PATH, codec="der")
+rfc5280_gser = asn1tools_ext.compile_files(RFC5280_ASN_PATH, codec="gser")
 
 decoded = rfc5280_der.decode("Certificate", certificate)
 encoded = rfc5280_gser.encode("Certificate", decoded, indent=4)
