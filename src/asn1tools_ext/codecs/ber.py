@@ -687,8 +687,8 @@ class PrimitiveOrConstructedType(Type):
 
 
 class StringType(StandardEncodeMixin, PrimitiveOrConstructedType):
-    TAG = None
-    ENCODING = None
+    TAG: int
+    ENCODING: str
 
     def __init__(self, name):
         super(StringType, self).__init__(

@@ -4,7 +4,7 @@ encode and decode types.
 """
 
 import typing
-from typing import Dict, List, Literal
+from typing import Any, Callable, Dict, Literal, Sequence, Set, Tuple
 
 from asn1tools_ext.codecs.codec import Codec
 
@@ -26,6 +26,17 @@ from .parser import parse_files, parse_string
 
 CodecType = Literal["ber", "der", "gser", "jer", "oer", "per", "uper", "xer"]
 
+# A parsed specification, as returned by the parser: module name to
+# module contents.
+SpecificationDict = Dict[str, Any]
+
+# Compiled types, type checkers or constraints checkers: module name
+# to type name to compiled object.
+CompiledModules = Dict[str, Dict[str, Any]]
+
+# Location of an ANY DEFINED BY member to its choices.
+AnyDefinedByChoices = Dict[Tuple[str, ...], Dict[Any, str]]
+
 
 class Specification(object):
     """This class is used to encode and decode ASN.1 types found in an
@@ -38,12 +49,18 @@ class Specification(object):
 
     """
 
-    def __init__(self, modules, decode_length, type_checkers, constraints_checkers):
+    def __init__(
+        self,
+        modules: CompiledModules,
+        decode_length: Callable[[bytes | bytearray], int | None],
+        type_checkers: CompiledModules,
+        constraints_checkers: CompiledModules,
+    ) -> None:
         self._modules = modules
         self._decode_length = decode_length
-        self._types = {}
+        self._types: Dict[str, Any] = {}
 
-        duplicated = set()
+        duplicated: Set[str] = set()
 
         for module_name in modules:
             types = modules[module_name]
@@ -63,7 +80,7 @@ class Specification(object):
                 self._types[type_name] = type_
 
     @property
-    def types(self):
+    def types(self) -> Dict[str, Any]:
         """A dictionary of all unique types in the specification. Types found
         in two or more modules are not part of this dictionary.
 
@@ -78,7 +95,7 @@ class Specification(object):
         return self._types
 
     @property
-    def modules(self):
+    def modules(self) -> CompiledModules:
         """A dictionary of all modules in the specification. Unlike
         :attr:`.types`, this attribute contains every type, even if
         the type name was found in two or more modules.
@@ -93,7 +110,14 @@ class Specification(object):
 
         return self._modules
 
-    def encode(self, name, data, check_types=True, check_constraints=False, **kwargs):
+    def encode(
+        self,
+        name: str,
+        data: Any,
+        check_types: bool = True,
+        check_constraints: bool = False,
+        **kwargs: Any,
+    ) -> bytes:
         """Encode given dictionary `data` as given type `name` and return the
         encoded data as a bytes object.
 
@@ -131,7 +155,9 @@ class Specification(object):
 
         return bytes(type_.encode(data, **kwargs))
 
-    def decode(self, name, data, check_constraints=False):
+    def decode(
+        self, name: str, data: bytes | bytearray, check_constraints: bool = False
+    ) -> Any:
         """Decode given bytes object `data` as given type `name` and return
         the decoded data as a dictionary.
 
@@ -160,7 +186,9 @@ class Specification(object):
 
         return decoded
 
-    def decode_with_length(self, name, data, check_constraints=False):
+    def decode_with_length(
+        self, name: str, data: bytes | bytearray, check_constraints: bool = False
+    ) -> Tuple[Any, int]:
         """Same as :func:`~asn1tools.compiler.Specification.decode`, but also
         returns the byte length of the decoded data.
 
@@ -184,7 +212,7 @@ class Specification(object):
 
         return decoded, length
 
-    def decode_length(self, data):
+    def decode_length(self, data: bytes | bytearray) -> int | None:
         """Decode the length of given data `data`. Returns None if not enough
         data was given to decode the length.
 
@@ -200,7 +228,9 @@ class Specification(object):
         return self._decode_length(data)
 
 
-def _compile_any_defined_by_type(type_, choices):
+def _compile_any_defined_by_type(
+    type_: Dict[str, Any], choices: Dict[Any, str]
+) -> None:
     type_["choices"] = {}
 
     for key, value in choices.items():
@@ -208,7 +238,9 @@ def _compile_any_defined_by_type(type_, choices):
         type_["choices"][key] = parse_string(specification)["A"]["types"]["B"]
 
 
-def _compile_any_defined_by_choices(specification, any_defined_by_choices):
+def _compile_any_defined_by_choices(
+    specification: SpecificationDict, any_defined_by_choices: AnyDefinedByChoices
+) -> None:
     for location, choices in any_defined_by_choices.items():
         module_name = location[0]
         type_names = location[1:-1]
@@ -230,11 +262,11 @@ def _compile_any_defined_by_choices(specification, any_defined_by_choices):
 
 
 def compile_dict(
-    specification,
+    specification: SpecificationDict,
     codec: CodecType = "ber",
-    any_defined_by_choices=None,
-    numeric_enums=False,
-):
+    any_defined_by_choices: AnyDefinedByChoices | None = None,
+    numeric_enums: bool = False,
+) -> Specification:
     """Compile given ASN.1 specification dictionary and return a
     :class:`~asn1tools.compiler.Specification` object that can be used
     to encode and decode data structures with given codec
@@ -276,8 +308,11 @@ def compile_dict(
 
 
 def compile_string(
-    string, codec: CodecType = "ber", any_defined_by_choices=None, numeric_enums=False
-):
+    string: str,
+    codec: CodecType = "ber",
+    any_defined_by_choices: AnyDefinedByChoices | None = None,
+    numeric_enums: bool = False,
+) -> Specification:
     """Compile given ASN.1 specification string and return a
     :class:`~asn1tools.compiler.Specification` object that can be used
     to encode and decode data structures with given codec
@@ -298,12 +333,12 @@ def compile_string(
 
 
 def compile_files(
-    filenames: List[str] | str,
+    filenames: Sequence[str] | str,
     codec: CodecType = "ber",
-    any_defined_by_choices=None,
-    encoding="utf-8",
-    numeric_enums=False,
-):
+    any_defined_by_choices: AnyDefinedByChoices | None = None,
+    encoding: str = "utf-8",
+    numeric_enums: bool = False,
+) -> Specification:
     """Compile given ASN.1 specification file(s) and return a
     :class:`~asn1tools.compiler.Specification` object that can be used
     to encode and decode data structures with given codec
@@ -328,7 +363,7 @@ def compile_files(
     )
 
 
-def pre_process_dict(specification):
+def pre_process_dict(specification: SpecificationDict) -> SpecificationDict:
     """Pre-process given specification dictionary, expanding COMPONENTS OF
     and adding extension markers if EXTENSIBILITY IMPLIED is active.
 

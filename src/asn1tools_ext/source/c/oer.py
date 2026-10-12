@@ -368,7 +368,6 @@ class _Generator(Generator):
                                 canonical(member.name),
                                 default_variable,
                                 default_variable,
-                                self.format_default(member),
                             ),
                             "    (src_p->{}{}.length != sizeof({}))) {{".format(
                                 self.location_inner("", "."),
@@ -618,7 +617,6 @@ class _Generator(Generator):
         decode_lines += [
             "for ({i} = 0; {i} < {unique_unknown_addition_bits}; {i}++) {{".format(
                 i=unique_i,
-                first_bit=len(type_.additions),
                 unique_unknown_addition_bits=unique_unknown_addition_bits,
             ),
             "    {} = decoder_read_length_determinant(decoder_p);".format(

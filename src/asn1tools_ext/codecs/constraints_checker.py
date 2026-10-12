@@ -79,7 +79,7 @@ class Type(object):
 
 
 class String(Type):
-    PERMITTED_ALPHABET = None
+    PERMITTED_ALPHABET: str | None = None
 
     def __init__(
         self, name, permitted_alphabet, minimum, maximum, has_extension_marker

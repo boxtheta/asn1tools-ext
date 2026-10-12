@@ -54,7 +54,7 @@ class Decoder(per.Decoder):
 
 class KnownMultiplierStringType(per.KnownMultiplierStringType):
     ENCODING = "ascii"
-    PERMITTED_ALPHABET = ""
+    PERMITTED_ALPHABET = PermittedAlphabet({}, {})
 
     def __init__(
         self,

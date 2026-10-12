@@ -652,7 +652,7 @@ class KnownMultiplierStringType(Type):
 
 
 class StringType(Type):
-    ENCODING = None
+    ENCODING: str
     LENGTH_MULTIPLIER = 1
 
     def __init__(self, name):

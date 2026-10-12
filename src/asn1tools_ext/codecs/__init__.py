@@ -1,6 +1,7 @@
 import binascii
 from datetime import datetime, timedelta, timezone
 from functools import wraps
+from typing import Any, List
 
 from ..errors import ConstraintsError as _ConstraintsError
 from ..errors import DecodeError as _DecodeError
@@ -13,34 +14,34 @@ class BaseType(object):
     Base Type class containing common functionality between all codecs
     """
 
-    def __init__(self, name, type_name):
+    def __init__(self, name: str | None, type_name: str) -> None:
         self.name = name
         self.type_name = type_name
         self.optional = False
-        self.default = None
+        self.default: Any = None
 
-    def set_default(self, value):
+    def set_default(self, value: Any) -> None:
         self.default = value
 
-    def get_default(self):
+    def get_default(self) -> Any:
         return self.default
 
-    def has_default(self):
+    def has_default(self) -> bool:
         return self.default is not None
 
-    def is_default(self, value):
+    def is_default(self, value: Any) -> bool:
         return value == self.default
 
-    def encode(self, *args, **kwargs):
+    def encode(self, *args: Any, **kwargs: Any) -> Any:
         raise NotImplementedError("To be implemented by subclasses.")
 
-    def decode(self, *args, **kwargs):
+    def decode(self, *args: Any, **kwargs: Any) -> Any:
         raise NotImplementedError("To be implemented by subclasses.")
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return "{}({})".format(self.__class__.__name__, self.name)
 
-    def type_label(self):
+    def type_label(self) -> str:
         return (
             "{}({})".format(self.type_name, self.name) if self.name else self.type_name
         )
@@ -51,16 +52,16 @@ class ErrorWithLocation(Exception):
     Mixin for Error classes which have location list
     """
 
-    def __init__(self, message, location=None):
+    def __init__(self, message: str, location: BaseType | None = None) -> None:
         """
 
         :param str message:
         :param BaseType location: Type error occured for
         """
         self.message = message
-        self.location = [location] if location else []
+        self.location: List[BaseType] = [location] if location else []
 
-    def add_location(self, element):
+    def add_location(self, element: BaseType) -> None:
         """
         Add location data for element
         :param BaseType element:
@@ -73,10 +74,10 @@ class ErrorWithLocation(Exception):
             self.location.append(element)
 
     @property
-    def location_str(self):
+    def location_str(self) -> str:
         return ".".join(loc.name for loc in self.location[::-1] if loc.name)
 
-    def __str__(self):
+    def __str__(self) -> str:
         if self.location:
             return "{}: {}".format(self.location_str, self.message)
         else:
@@ -94,7 +95,12 @@ class DecodeError(ErrorWithLocation, _DecodeError):
     General ASN.1 decode error with error location in the message.
     """
 
-    def __init__(self, message, offset=None, location=None):
+    def __init__(
+        self,
+        message: str,
+        offset: int | None = None,
+        location: BaseType | None = None,
+    ) -> None:
         """
 
         :param str message: Message for error
@@ -104,7 +110,7 @@ class DecodeError(ErrorWithLocation, _DecodeError):
         super(DecodeError, self).__init__(message, location=location)
         self.offset = offset
 
-    def __str__(self):
+    def __str__(self) -> str:
         if self.location:
             _str = "{}: {}".format(self.location_str, self.message)
         else:
@@ -113,7 +119,7 @@ class DecodeError(ErrorWithLocation, _DecodeError):
             _str += self.get_offset_message()
         return _str
 
-    def get_offset_message(self):
+    def get_offset_message(self) -> str:
         """
         Get offset details to add to error message
         :return:
@@ -134,12 +140,12 @@ class OutOfDataError(DecodeError):
     Error for when trying to read data beyond length of type
     """
 
-    def __init__(self, offset_bits, location=None):
+    def __init__(self, offset_bits: int, location: BaseType | None = None) -> None:
         super(OutOfDataError, self).__init__(
             "out of data", offset=offset_bits, location=location
         )
 
-    def get_offset_message(self):
+    def get_offset_message(self) -> str:
         """
         Get offset details to add to error message
         :return:
@@ -147,7 +153,7 @@ class OutOfDataError(DecodeError):
         return " (At bit offset: {})".format(self.offset)
 
 
-def _generalized_time_to_datetime(string):
+def _generalized_time_to_datetime(string: str) -> datetime:
     length = len(string)
 
     if "." in string:
@@ -168,7 +174,7 @@ def _generalized_time_to_datetime(string):
         raise ValueError
 
 
-def format_or(items):
+def format_or(items: List[Any]) -> str:
     """Return a string of comma separated items, with the last to items
     separated by "or".
 
@@ -192,7 +198,7 @@ def format_or(items):
         return "{} or {}".format(", ".join(formatted_items[:-1]), formatted_items[-1])
 
 
-def utc_time_to_datetime(string):
+def utc_time_to_datetime(string: str) -> datetime:
     """Convert given ASN.1 UTC time string `string` to a
     ``datetime.datetime`` object.
 
@@ -218,7 +224,7 @@ def utc_time_to_datetime(string):
         raise Error("Expected a UTC time string, but got '{}'.".format(string))
 
 
-def utc_time_from_datetime(date):
+def utc_time_from_datetime(date: datetime) -> str:
     """Convert given ``datetime.datetime`` object `date` to an ASN.1 UTC
     time string.
 
@@ -237,7 +243,7 @@ def utc_time_from_datetime(date):
     return date.strftime(fmt)
 
 
-def restricted_utc_time_to_datetime(string):
+def restricted_utc_time_to_datetime(string: str) -> datetime:
     """Convert given restricted ASN.1 UTC time string `string` to a
     ``datetime.datetime`` object.
 
@@ -257,19 +263,21 @@ def restricted_utc_time_to_datetime(string):
         )
 
 
-def restricted_utc_time_from_datetime(date):
+def restricted_utc_time_from_datetime(date: datetime) -> str:
     """Convert given ``datetime.datetime`` object `date` to an restricted
     ASN.1 UTC time string.
 
     """
 
-    if date.tzinfo is not None:
-        date -= date.utcoffset()
+    offset = date.utcoffset()
+
+    if offset is not None:
+        date -= offset
 
     return date.strftime("%y%m%d%H%M%S") + "Z"
 
 
-def generalized_time_to_datetime(string):
+def generalized_time_to_datetime(string: str) -> datetime:
     """Convert given ASN.1 generalized time string `string` to a
     ``datetime.datetime`` object.
 
@@ -299,7 +307,7 @@ def generalized_time_to_datetime(string):
         raise Error("Expected a generalized time string, but got '{}'.".format(string))
 
 
-def generalized_time_from_datetime(date):
+def generalized_time_from_datetime(date: datetime) -> str:
     """Convert given ``datetime.datetime`` object `date` to an ASN.1
     generalized time string.
 
@@ -325,7 +333,7 @@ def generalized_time_from_datetime(date):
     return string
 
 
-def restricted_generalized_time_to_datetime(string):
+def restricted_generalized_time_to_datetime(string: str) -> datetime:
     """Convert given restricted ASN.1 generalized time string `string` to
     a ``datetime.datetime`` object.
 
@@ -355,14 +363,16 @@ def restricted_generalized_time_to_datetime(string):
         )
 
 
-def restricted_generalized_time_from_datetime(date):
+def restricted_generalized_time_from_datetime(date: datetime) -> str:
     """Convert given ``datetime.datetime`` object `date` to an restricted
     ASN.1 generalized time string.
 
     """
 
-    if date.tzinfo is not None:
-        date -= date.utcoffset()
+    offset = date.utcoffset()
+
+    if offset is not None:
+        date -= offset
 
     if date.microsecond > 0:
         string = date.strftime("%Y%m%d%H%M%S.%f").rstrip("0")
@@ -372,7 +382,7 @@ def restricted_generalized_time_from_datetime(date):
     return string + "Z"
 
 
-def format_bytes(tag):
+def format_bytes(tag: bytes | bytearray) -> str:
     """
     Format tag as hex string
     :param bytes tag:

@@ -26,7 +26,7 @@ STRING_TYPES = [
 
 
 class Type(object):
-    TYPE = None
+    TYPE: type
 
     def __init__(self, name):
         self.name = name

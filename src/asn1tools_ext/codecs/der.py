@@ -52,8 +52,8 @@ class Type(ber.StandardDecodeMixin, ber.Type):
 
 
 class StringType(StandardEncodeMixin, Type):
-    TAG = None
-    ENCODING = None
+    TAG: int
+    ENCODING: str
 
     def __init__(self, name):
         super(StringType, self).__init__(name, self.__class__.__name__, self.TAG)

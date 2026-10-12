@@ -3,7 +3,7 @@
 import logging
 import re
 import sys
-from typing import List
+from typing import Any, Dict, Sequence
 
 from pyparsing import (
     Combine,
@@ -1752,7 +1752,7 @@ def create_grammar():
     return specification
 
 
-def ignore_comments(string):
+def ignore_comments(string: str) -> str:
     """Ignore comments in given string by replacing them with spaces. This
     reduces the parsing time by roughly a factor of two.
 
@@ -1814,7 +1814,7 @@ def ignore_comments(string):
     return "".join(chunks)
 
 
-def parse_string(string):
+def parse_string(string: str) -> Dict[str, Any]:
     """Parse given ASN.1 specification string and return a dictionary of
     its contents.
 
@@ -1841,7 +1841,9 @@ def parse_string(string):
     return tokens[0]
 
 
-def parse_files(filenames: List[str] | str, encoding="utf-8"):
+def parse_files(
+    filenames: Sequence[str] | str, encoding: str = "utf-8"
+) -> Dict[str, Any]:
     """Parse given ASN.1 specification file(s) and return a dictionary of
     its/their contents.
 
