@@ -55,6 +55,11 @@ Installation
 
     pip install asn1tools_ext
 
+The package is imported as ``asn1tools_ext``. It also installs an
+``asn1tools`` alias, so existing code doing ``import asn1tools`` keeps
+working. Do not install it alongside the original ``asn1tools``
+package, as both provide that module.
+
 Example Usage
 =============
 
