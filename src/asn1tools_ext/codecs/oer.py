@@ -296,8 +296,8 @@ class Type(BaseType):
 
 
 class KnownMultiplierStringType(Type):
-    TAG = None
-    ENCODING = None
+    TAG: int
+    ENCODING: str
 
     def __init__(self, name, minimum=None, maximum=None, has_extension_marker=False):
         super(KnownMultiplierStringType, self).__init__(
