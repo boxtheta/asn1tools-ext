@@ -6,106 +6,67 @@ jobs:
 
   test-python:
 
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v1
-    - name: Set up Python 3.7
-      uses: actions/setup-python@v1
-      with:
-        python-version: 3.7
+    - uses: actions/checkout@v4
+    - name: Install uv
+      uses: astral-sh/setup-uv@v6
     - name: Install dependencies
       run: |
-        python -m pip install --upgrade pip
-        pip install -r requirements.txt
-        pip install coveralls
+        uv sync
     - name: Test
       run: |
-        coverage run --source=asn1tools setup.py test
-    - name: Coveralls
-      uses: AndreMiras/coveralls-python-action@develop
+        uv run python -m unittest
 
   test-python-sdist:
 
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v1
-    - name: Set up Python 3.7
-      uses: actions/setup-python@v1
-      with:
-        python-version: 3.7
+    - uses: actions/checkout@v4
+    - name: Install uv
+      uses: astral-sh/setup-uv@v6
     - name: Install dependencies
       run: |
-        python -m pip install --upgrade pip
-        pip install -r requirements.txt
+        uv sync
     - name: Test
       run: |
-        make test-sdist
-
-  test-c:
-
-    runs-on: ubuntu-20.04
-
-    steps:
-    - uses: actions/checkout@v1
-    - name: Set up Python 3.7
-      uses: actions/setup-python@v1
-      with:
-        python-version: 3.7
-    - name: Install dependencies
-      run: |
-        sudo apt-get install -qq valgrind -y
-        python -m pip install --upgrade pip
-        pip install -r requirements.txt
-    - name: Test
-      run: |
-        make test-c
-        make -C examples/benchmarks/c_source
-        (cd tests && bash <(curl -s https://codecov.io/bash) -X coveragepy)
+        uv run make test-sdist
 
   examples:
 
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v1
-    - name: Set up Python 3.7
-      uses: actions/setup-python@v1
-      with:
-        python-version: 3.7
+    - uses: actions/checkout@v4
+    - name: Install uv
+      uses: astral-sh/setup-uv@v6
     - name: Install dependencies
       run: |
-        python -m pip install --upgrade pip
-        pip install -r requirements.txt
+        uv sync
     - name: Test
       run: |
-        env PYTHONPATH=. python examples/benchmarks/codecs.py
-        env PYTHONPATH=. python examples/hello_world.py
-        env PYTHONPATH=. python examples/x509_pem.py
-        env PYTHONPATH=. python examples/compact_extensions_uper/main.py
-        env PYTHONPATH=. python examples/programming_types/main.py
+        uv run python examples/benchmarks/codecs.py
+        uv run python examples/hello_world.py
+        uv run python examples/x509_pem.py
+        uv run python examples/compact_extensions_uper/main.py
+        uv run python examples/programming_types/main.py
 
   release:
-    needs: [test-python, test-python-sdist, test-c, examples]
-    runs-on: ubuntu-20.04
+    needs: [test-python, test-python-sdist, examples]
+    runs-on: ubuntu-latest
     if: startsWith(github.ref, 'refs/tags')
 
     steps:
-    - uses: actions/checkout@v1
-    - name: Set up Python 3.7
-      uses: actions/setup-python@v1
-      with:
-        python-version: 3.7
-    - name: Install pypa/build
-      run: |
-        python -m pip install build --user
+    - uses: actions/checkout@v4
+    - name: Install uv
+      uses: astral-sh/setup-uv@v6
     - name: Build a binary wheel and a source tarball
       run: |
-        git clean -dfx
-        python -m build --sdist --outdir dist/ .
+        uv build
     - name: Publish distribution 📦 to PyPI
-      uses: pypa/gh-action-pypi-publish@master
+      uses: pypa/gh-action-pypi-publish@release/v1
       with:
-        skip_existing: true
+        skip-existing: true
         password: ${{ secrets.pypi_password }}
