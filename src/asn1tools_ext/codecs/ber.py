@@ -1710,6 +1710,10 @@ class BERCodec(Codec):
     def compile_dict(specification, numeric_enums=False):
         return Compiler(specification, numeric_enums).process()
 
+    @staticmethod
+    def decode_full_length(data):
+        return decode_full_length(data)
+
 
 def decode_full_length(data):
     """
