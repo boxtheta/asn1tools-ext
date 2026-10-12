@@ -11,7 +11,7 @@ EXPECTED = {
             },
             "ERROR-CLASS": {
                 "members": [
-                    {"name": "&category", "type": "PrintableString"},
+                    {"name": "&category", "size": [1], "type": "PrintableString"},
                     {"name": "&code", "type": "INTEGER"},
                     {"name": "&Type", "type": "OpenType"},
                 ]
