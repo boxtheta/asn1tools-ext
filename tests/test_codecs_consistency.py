@@ -6,7 +6,7 @@ from datetime import time
 from datetime import datetime
 from copy import deepcopy
 from .utils import Asn1ToolsBaseTest
-import asn1tools
+import asn1tools_ext
 
 sys.path.append("tests/files")
 
@@ -33,10 +33,10 @@ class Asn1ToolsCodecsConsistencyTest(Asn1ToolsBaseTest):
 
         for codec in CODECS:
             foos.append(
-                asn1tools.compile_string(spec, codec, numeric_enums=numeric_enums)
+                asn1tools_ext.compile_string(spec, codec, numeric_enums=numeric_enums)
             )
 
-        gser = asn1tools.compile_string(spec, "gser", numeric_enums=numeric_enums)
+        gser = asn1tools_ext.compile_string(spec, "gser", numeric_enums=numeric_enums)
 
         for value in values:
             decoded = value
@@ -69,12 +69,12 @@ class Asn1ToolsCodecsConsistencyTest(Asn1ToolsBaseTest):
         )
 
         for codec, encoded_message in zip(ALL_CODECS, encoded):
-            foo = asn1tools.compile_string(spec, codec)
+            foo = asn1tools_ext.compile_string(spec, codec)
             self.encode_decode_codec(foo, codec, "A", decoded, encoded_message)
 
     def encode_decode_codecs_file(self, filename, type_name, decoded, encoded):
         for codec, encoded_message in zip(ALL_CODECS, encoded):
-            foo = asn1tools.compile_files(filename, codec)
+            foo = asn1tools_ext.compile_files(filename, codec)
             self.encode_decode_codec(foo, codec, type_name, decoded, encoded_message)
 
     def decode_codecs(self, type_spec, decoded, encoded, numeric_enums=False):
@@ -83,7 +83,7 @@ class Asn1ToolsCodecsConsistencyTest(Asn1ToolsBaseTest):
         )
 
         for codec, encoded_message in zip(CODECS, encoded):
-            foo = asn1tools.compile_string(spec, codec, numeric_enums=numeric_enums)
+            foo = asn1tools_ext.compile_string(spec, codec, numeric_enums=numeric_enums)
             decoded_message = foo.decode("A", encoded_message, check_constraints=True)
             self.assertEqual(decoded_message, decoded)
 
@@ -267,9 +267,9 @@ class Asn1ToolsCodecsConsistencyTest(Asn1ToolsBaseTest):
         )
 
         for codec in ALL_CODECS:
-            foo = asn1tools.compile_string(spec, codec)
+            foo = asn1tools_ext.compile_string(spec, codec)
 
-            with self.assertRaises(asn1tools.EncodeError) as cm:
+            with self.assertRaises(asn1tools_ext.EncodeError) as cm:
                 foo.encode("A", {"a": {"b": ("c", {})}})
             self.assertEqual(
                 str(cm.exception), "A.a.b.c: Sequence member 'd' not found in {}."
@@ -574,10 +574,10 @@ class Asn1ToolsCodecsConsistencyTest(Asn1ToolsBaseTest):
         ]
 
         for codec in ALL_CODECS:
-            foo = asn1tools.compile_files("tests/files/named_numbers.asn", codec)
+            foo = asn1tools_ext.compile_files("tests/files/named_numbers.asn", codec)
 
             for type_name, decoded, message in datas:
-                with self.assertRaises(asn1tools.ConstraintsError) as cm:
+                with self.assertRaises(asn1tools_ext.ConstraintsError) as cm:
                     foo.encode(type_name, decoded, check_constraints=True)
 
                 self.assertEqual(str(cm.exception), message)
@@ -587,7 +587,7 @@ class Asn1ToolsCodecsConsistencyTest(Asn1ToolsBaseTest):
 
         for codec in CODECS:
             specs.append(
-                asn1tools.compile_files(
+                asn1tools_ext.compile_files(
                     "examples/programming_types/programming_types.asn", codec
                 )
             )
@@ -612,7 +612,7 @@ class Asn1ToolsCodecsConsistencyTest(Asn1ToolsBaseTest):
 
         for codec in CODECS:
             specs.append(
-                asn1tools.compile_files(
+                asn1tools_ext.compile_files(
                     [
                         "tests/files/c_source/c_source.asn",
                         "examples/programming_types/programming_types.asn",
@@ -1425,7 +1425,7 @@ class Asn1ToolsCodecsConsistencyTest(Asn1ToolsBaseTest):
         specs = []
 
         for codec in CODECS:
-            specs.append(asn1tools.compile_dict(deepcopy(PARAMETERIZATION), codec))
+            specs.append(asn1tools_ext.compile_dict(deepcopy(PARAMETERIZATION), codec))
 
         # A-Boolean.
         decoded = {"a": True}

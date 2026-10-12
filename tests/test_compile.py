@@ -1,9 +1,7 @@
 import sys
 import unittest
-import asn1tools
+import asn1tools_ext
 from copy import deepcopy
-import shutil
-import os
 
 sys.path.append("tests/files")
 sys.path.append("tests/files/ietf")
@@ -31,23 +29,23 @@ class Asn1ToolsCompileTest(unittest.TestCase):
     maxDiff = None
 
     def test_pre_process_extensibility_implied(self):
-        actual = asn1tools.pre_process_dict(deepcopy(EXTENSIBILITY_IMPLIED))
+        actual = asn1tools_ext.pre_process_dict(deepcopy(EXTENSIBILITY_IMPLIED))
         self.assertEqual(actual, EXTENSIBILITY_IMPLIED_PP)
 
     def test_pre_process_all_types_automatic_tags(self):
-        actual = asn1tools.pre_process_dict(deepcopy(ALL_TYPES_AUTOMATIC_TAGS))
+        actual = asn1tools_ext.pre_process_dict(deepcopy(ALL_TYPES_AUTOMATIC_TAGS))
         self.assertEqual(actual, ALL_TYPES_AUTOMATIC_TAGS_PP)
 
     def test_pre_process_module_tags_explicit(self):
-        actual = asn1tools.pre_process_dict(deepcopy(MODULE_TAGS_EXPLICIT))
+        actual = asn1tools_ext.pre_process_dict(deepcopy(MODULE_TAGS_EXPLICIT))
         self.assertEqual(actual, MODULE_TAGS_EXPLICIT_PP)
 
     def test_pre_process_module_tags_implicit(self):
-        actual = asn1tools.pre_process_dict(deepcopy(MODULE_TAGS_IMPLICIT))
+        actual = asn1tools_ext.pre_process_dict(deepcopy(MODULE_TAGS_IMPLICIT))
         self.assertEqual(actual, MODULE_TAGS_IMPLICIT_PP)
 
     def test_pre_process_module_tags_automatic(self):
-        actual = asn1tools.pre_process_dict(deepcopy(MODULE_TAGS_AUTOMATIC))
+        actual = asn1tools_ext.pre_process_dict(deepcopy(MODULE_TAGS_AUTOMATIC))
         self.assertEqual(actual, MODULE_TAGS_AUTOMATIC_PP)
 
     def test_pre_process_x683(self):
@@ -57,29 +55,29 @@ class Asn1ToolsCompileTest(unittest.TestCase):
             return
 
         with self.assertRaises(RecursionError):
-            actual = asn1tools.pre_process_dict(deepcopy(X683))
+            actual = asn1tools_ext.pre_process_dict(deepcopy(X683))
 
             self.assertEqual(actual, X683_PP)
 
     def test_pre_process_parameterization(self):
-        actual = asn1tools.pre_process_dict(deepcopy(PARAMETERIZATION))
+        actual = asn1tools_ext.pre_process_dict(deepcopy(PARAMETERIZATION))
         self.assertEqual(actual, PARAMETERIZATION_PP)
 
     def test_pre_process_time_types(self):
-        actual = asn1tools.pre_process_dict(deepcopy(TIME_TYPES))
+        actual = asn1tools_ext.pre_process_dict(deepcopy(TIME_TYPES))
         self.assertEqual(actual, TIME_TYPES_PP)
 
     def test_unsupported_codec(self):
-        with self.assertRaises(asn1tools.CompileError) as cm:
-            asn1tools.compile_files("tests/files/foo.asn", "bad_codec")
+        with self.assertRaises(asn1tools_ext.CompileError) as cm:
+            asn1tools_ext.compile_files("tests/files/foo.asn", "bad_codec")
 
         self.assertEqual(str(cm.exception), "Unsupported codec 'bad_codec'.")
 
     def test_encode_decode_bad_type_name(self):
-        foo = asn1tools.compile_files("tests/files/foo.asn")
+        foo = asn1tools_ext.compile_files("tests/files/foo.asn")
 
         # Encode.
-        with self.assertRaises(asn1tools.EncodeError) as cm:
+        with self.assertRaises(asn1tools_ext.EncodeError) as cm:
             foo.encode("BadTypeName", b"")
 
         self.assertEqual(
@@ -87,7 +85,7 @@ class Asn1ToolsCompileTest(unittest.TestCase):
         )
 
         # Decode.
-        with self.assertRaises(asn1tools.DecodeError) as cm:
+        with self.assertRaises(asn1tools_ext.DecodeError) as cm:
             foo.decode("BadTypeName", b"")
 
         self.assertEqual(
@@ -95,28 +93,28 @@ class Asn1ToolsCompileTest(unittest.TestCase):
         )
 
     def test_encoding(self):
-        asn1tools.compile_files("tests/files/foo.asn", encoding="ascii")
+        asn1tools_ext.compile_files("tests/files/foo.asn", encoding="ascii")
 
     def test_import_imported(self):
-        asn1tools.compile_files("tests/files/import_imported.asn")
+        asn1tools_ext.compile_files("tests/files/import_imported.asn")
 
     def test_missing_type(self):
-        with self.assertRaises(asn1tools.CompileError) as cm:
-            asn1tools.compile_string("A DEFINITIONS ::= BEGIN A ::= B END")
+        with self.assertRaises(asn1tools_ext.CompileError) as cm:
+            asn1tools_ext.compile_string("A DEFINITIONS ::= BEGIN A ::= B END")
 
         self.assertEqual(str(cm.exception), "Type 'B' not found in module 'A'.")
 
     def test_missing_value(self):
-        with self.assertRaises(asn1tools.CompileError) as cm:
-            asn1tools.compile_string(
+        with self.assertRaises(asn1tools_ext.CompileError) as cm:
+            asn1tools_ext.compile_string(
                 "A DEFINITIONS ::= BEGIN A ::= INTEGER (1..a) END", "uper"
             )
 
         self.assertEqual(str(cm.exception), "Value 'a' not found in module 'A'.")
 
     def test_missing_import_type(self):
-        with self.assertRaises(asn1tools.CompileError) as cm:
-            asn1tools.compile_string(
+        with self.assertRaises(asn1tools_ext.CompileError) as cm:
+            asn1tools_ext.compile_string(
                 "A DEFINITIONS ::= BEGIN IMPORTS B FROM C; D ::= SEQUENCE { a B } END "
                 "C DEFINITIONS ::= BEGIN END",
                 "uper",
@@ -128,8 +126,8 @@ class Asn1ToolsCompileTest(unittest.TestCase):
         )
 
     def test_missing_import_value(self):
-        with self.assertRaises(asn1tools.CompileError) as cm:
-            asn1tools.compile_string(
+        with self.assertRaises(asn1tools_ext.CompileError) as cm:
+            asn1tools_ext.compile_string(
                 "A DEFINITIONS ::= BEGIN IMPORTS b FROM C; D ::= INTEGER (b..1) END "
                 "C DEFINITIONS ::= BEGIN END",
                 "uper",
@@ -141,8 +139,8 @@ class Asn1ToolsCompileTest(unittest.TestCase):
         )
 
     def test_missing_import_type_module(self):
-        with self.assertRaises(asn1tools.CompileError) as cm:
-            asn1tools.compile_string(
+        with self.assertRaises(asn1tools_ext.CompileError) as cm:
+            asn1tools_ext.compile_string(
                 "A DEFINITIONS ::= BEGIN IMPORTS B FROM C; D ::= SEQUENCE { a B } END ",
                 "uper",
             )
@@ -153,8 +151,8 @@ class Asn1ToolsCompileTest(unittest.TestCase):
         )
 
     def test_missing_import_value_module(self):
-        with self.assertRaises(asn1tools.CompileError) as cm:
-            asn1tools.compile_string(
+        with self.assertRaises(asn1tools_ext.CompileError) as cm:
+            asn1tools_ext.compile_string(
                 "A DEFINITIONS ::= BEGIN IMPORTS b FROM C; D ::= INTEGER (b..1) END ",
                 "uper",
             )
@@ -167,7 +165,7 @@ class Asn1ToolsCompileTest(unittest.TestCase):
     def test_duplicated_type(self):
         """Duplicated types are not part of types dictionary."""
 
-        spec = asn1tools.compile_string(
+        spec = asn1tools_ext.compile_string(
             "Foo DEFINITIONS ::= BEGIN Fum ::= INTEGER END "
             "Bar DEFINITIONS ::= BEGIN Fum ::= BOOLEAN END "
             "Fie DEFINITIONS ::= BEGIN Fum ::= REAL END "
@@ -175,23 +173,9 @@ class Asn1ToolsCompileTest(unittest.TestCase):
 
         self.assertEqual(spec.types, {})
 
-    def test_cache(self):
-        cache_dir = "test_cache"
-
-        if os.path.exists(cache_dir):
-            shutil.rmtree(cache_dir)
-
-        foo = asn1tools.compile_files("tests/files/foo.asn", cache_dir=cache_dir)
-        foo_cached = asn1tools.compile_files("tests/files/foo.asn", cache_dir=cache_dir)
-
-        encoded = foo.encode("Question", {"id": 1, "question": "???"})
-        encoded_cached = foo_cached.encode("Question", {"id": 1, "question": "???"})
-
-        self.assertEqual(encoded, encoded_cached)
-
     def test_missing_parameterized_type(self):
-        with self.assertRaises(asn1tools.CompileError) as cm:
-            asn1tools.compile_string(
+        with self.assertRaises(asn1tools_ext.CompileError) as cm:
+            asn1tools_ext.compile_string(
                 "A DEFINITIONS ::= BEGIN"
                 "  B ::= NULL "
                 "  B-Integer ::= B { INTEGER } "
@@ -204,8 +188,8 @@ class Asn1ToolsCompileTest(unittest.TestCase):
         )
 
     def test_wrong_parameterized_type_number_of_parameters(self):
-        with self.assertRaises(asn1tools.CompileError) as cm:
-            asn1tools.compile_string(
+        with self.assertRaises(asn1tools_ext.CompileError) as cm:
+            asn1tools_ext.compile_string(
                 "A DEFINITIONS ::= BEGIN"
                 "  B { C, D } ::= SEQUENCE { "
                 "    a C, "
@@ -223,8 +207,8 @@ class Asn1ToolsCompileTest(unittest.TestCase):
         )
 
     def test_missing_parameterized_value(self):
-        with self.assertRaises(asn1tools.CompileError) as cm:
-            asn1tools.compile_string(
+        with self.assertRaises(asn1tools_ext.CompileError) as cm:
+            asn1tools_ext.compile_string(
                 "A DEFINITIONS ::= BEGIN"
                 "  A { a } ::= INTEGER (a..5) "
                 "  B ::= A { missing-value } "

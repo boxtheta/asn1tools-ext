@@ -22,7 +22,7 @@ $
 import os
 import binascii
 import struct
-import asn1tools
+import asn1tools_ext
 
 
 SCRIPT_DIR = os.path.dirname(os.path.realpath(__file__))
@@ -36,7 +36,7 @@ print()
 
 MY_PROTOCOL_ASN_PATH = os.path.realpath(os.path.join(SCRIPT_DIR, "my_protocol.asn"))
 
-my_protocol = asn1tools.compile_files(
+my_protocol = asn1tools_ext.compile_files(
     [MY_PROTOCOL_ASN_PATH, PROGRAMMING_TYPES_ASN_PATH]
 )
 
@@ -56,7 +56,7 @@ print()
 
 ALL_TYPES_ASN_PATH = os.path.realpath(os.path.join(SCRIPT_DIR, "all_types.asn"))
 
-all_types = asn1tools.compile_files(
+all_types = asn1tools_ext.compile_files(
     [ALL_TYPES_ASN_PATH, PROGRAMMING_TYPES_ASN_PATH], "oer"
 )
 

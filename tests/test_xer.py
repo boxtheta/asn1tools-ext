@@ -3,11 +3,11 @@
 
 import unittest
 from .utils import Asn1ToolsBaseTest
-import asn1tools
+import asn1tools_ext
 import sys
 from copy import deepcopy
-from asn1tools.codecs import utc_time_to_datetime as ut2dt
-from asn1tools.codecs import generalized_time_to_datetime as gt2dt
+from asn1tools_ext.codecs import utc_time_to_datetime as ut2dt
+from asn1tools_ext.codecs import generalized_time_to_datetime as gt2dt
 
 sys.path.append("tests/files/3gpp")
 
@@ -18,7 +18,7 @@ class Asn1ToolsXerTest(Asn1ToolsBaseTest):
     maxDiff = None
 
     def test_real(self):
-        foo = asn1tools.compile_string(
+        foo = asn1tools_ext.compile_string(
             "Foo DEFINITIONS AUTOMATIC TAGS ::= BEGIN A ::= REAL END", "xer"
         )
 
@@ -37,7 +37,7 @@ class Asn1ToolsXerTest(Asn1ToolsBaseTest):
             self.assert_encode_decode_string(foo, type_name, decoded, encoded)
 
     def test_null(self):
-        foo = asn1tools.compile_string(
+        foo = asn1tools_ext.compile_string(
             "Foo DEFINITIONS AUTOMATIC TAGS ::= "
             "BEGIN "
             "A ::= NULL "
@@ -57,7 +57,7 @@ class Asn1ToolsXerTest(Asn1ToolsBaseTest):
             self.assert_encode_decode_string(foo, type_name, decoded, encoded)
 
     def test_bit_string(self):
-        foo = asn1tools.compile_string(
+        foo = asn1tools_ext.compile_string(
             "Foo DEFINITIONS AUTOMATIC TAGS ::= BEGIN A ::= BIT STRING END", "xer"
         )
 
@@ -77,7 +77,7 @@ class Asn1ToolsXerTest(Asn1ToolsBaseTest):
             self.assert_encode_decode_string(foo, type_name, decoded, encoded)
 
     def test_octet_string(self):
-        foo = asn1tools.compile_string(
+        foo = asn1tools_ext.compile_string(
             "Foo DEFINITIONS AUTOMATIC TAGS ::= BEGIN A ::= OCTET STRING END", "xer"
         )
 
@@ -93,7 +93,7 @@ class Asn1ToolsXerTest(Asn1ToolsBaseTest):
         self.assertEqual(b"\x01\x23", foo.decode("A", b"<A>123</A>"))
 
     def test_object_identifier(self):
-        foo = asn1tools.compile_string(
+        foo = asn1tools_ext.compile_string(
             "Foo DEFINITIONS AUTOMATIC TAGS ::= BEGIN A ::= OBJECT IDENTIFIER END",
             "xer",
         )
@@ -103,7 +103,7 @@ class Asn1ToolsXerTest(Asn1ToolsBaseTest):
         for type_name, decoded, encoded in datas:
             self.assert_encode_decode_string(foo, type_name, decoded, encoded)
 
-        with self.assertRaises(asn1tools.DecodeError) as cm:
+        with self.assertRaises(asn1tools_ext.DecodeError) as cm:
             foo.decode("A", b"<A></A>")
 
         self.assertEqual(
@@ -111,7 +111,7 @@ class Asn1ToolsXerTest(Asn1ToolsBaseTest):
         )
 
     def test_external(self):
-        foo = asn1tools.compile_string(
+        foo = asn1tools_ext.compile_string(
             "Foo DEFINITIONS AUTOMATIC TAGS ::= BEGIN A ::= EXTERNAL END", "xer"
         )
 
@@ -127,7 +127,7 @@ class Asn1ToolsXerTest(Asn1ToolsBaseTest):
             self.assert_encode_decode(foo, type_name, decoded, encoded)
 
     def test_enumerated(self):
-        foo = asn1tools.compile_string(
+        foo = asn1tools_ext.compile_string(
             "Foo DEFINITIONS AUTOMATIC TAGS ::= "
             "BEGIN "
             "A ::= ENUMERATED { r(5), t(10) } "
@@ -142,7 +142,7 @@ class Asn1ToolsXerTest(Asn1ToolsBaseTest):
             self.assert_encode_decode(foo, type_name, decoded, encoded)
 
         # Encode error.
-        with self.assertRaises(asn1tools.EncodeError) as cm:
+        with self.assertRaises(asn1tools_ext.EncodeError) as cm:
             foo.encode("A", "foo")
 
         self.assertEqual(
@@ -151,7 +151,7 @@ class Asn1ToolsXerTest(Asn1ToolsBaseTest):
         )
 
         # Decode error.
-        with self.assertRaises(asn1tools.DecodeError) as cm:
+        with self.assertRaises(asn1tools_ext.DecodeError) as cm:
             foo.decode("A", b"<A><bar /></A>")
 
         self.assertEqual(
@@ -160,7 +160,7 @@ class Asn1ToolsXerTest(Asn1ToolsBaseTest):
         )
 
         # Encode of error.
-        with self.assertRaises(asn1tools.EncodeError) as cm:
+        with self.assertRaises(asn1tools_ext.EncodeError) as cm:
             foo.encode("B", ["foo"])
 
         self.assertEqual(
@@ -168,7 +168,7 @@ class Asn1ToolsXerTest(Asn1ToolsBaseTest):
         )
 
         # Decode of error.
-        with self.assertRaises(asn1tools.DecodeError) as cm:
+        with self.assertRaises(asn1tools_ext.DecodeError) as cm:
             foo.decode("B", b"<B><bar /></B>")
 
         self.assertEqual(
@@ -176,7 +176,7 @@ class Asn1ToolsXerTest(Asn1ToolsBaseTest):
         )
 
     def test_sequence(self):
-        foo = asn1tools.compile_string(
+        foo = asn1tools_ext.compile_string(
             "Foo DEFINITIONS AUTOMATIC TAGS ::= "
             "BEGIN "
             "A ::= SEQUENCE { "
@@ -203,7 +203,7 @@ class Asn1ToolsXerTest(Asn1ToolsBaseTest):
         self.assertEqual(foo.decode("B", b"<B />"), {"a": 4})
 
     def test_sequence_of(self):
-        foo = asn1tools.compile_string(
+        foo = asn1tools_ext.compile_string(
             "Foo DEFINITIONS AUTOMATIC TAGS ::= "
             "BEGIN "
             "A ::= SEQUENCE OF INTEGER "
@@ -253,7 +253,7 @@ class Asn1ToolsXerTest(Asn1ToolsBaseTest):
             self.assert_encode_decode_string(foo, type_name, decoded, encoded)
 
     def test_choice(self):
-        foo = asn1tools.compile_string(
+        foo = asn1tools_ext.compile_string(
             "Foo DEFINITIONS AUTOMATIC TAGS ::= "
             "BEGIN "
             "A ::= CHOICE { "
@@ -278,7 +278,7 @@ class Asn1ToolsXerTest(Asn1ToolsBaseTest):
             self.assert_encode_decode_string(foo, type_name, decoded, encoded)
 
         # Encode error.
-        with self.assertRaises(asn1tools.EncodeError) as cm:
+        with self.assertRaises(asn1tools_ext.EncodeError) as cm:
             foo.encode("A", ("d", None))
 
         self.assertEqual(
@@ -286,7 +286,7 @@ class Asn1ToolsXerTest(Asn1ToolsBaseTest):
         )
 
         # Decode error.
-        with self.assertRaises(asn1tools.DecodeError) as cm:
+        with self.assertRaises(asn1tools_ext.DecodeError) as cm:
             foo.decode("A", b"<A><d><true /></d></A>")
 
         self.assertEqual(
@@ -294,7 +294,7 @@ class Asn1ToolsXerTest(Asn1ToolsBaseTest):
         )
 
         # Encode of error.
-        with self.assertRaises(asn1tools.EncodeError) as cm:
+        with self.assertRaises(asn1tools_ext.EncodeError) as cm:
             foo.encode("B", [("d", None)])
 
         self.assertEqual(
@@ -302,7 +302,7 @@ class Asn1ToolsXerTest(Asn1ToolsBaseTest):
         )
 
         # Decode of error.
-        with self.assertRaises(asn1tools.DecodeError) as cm:
+        with self.assertRaises(asn1tools_ext.DecodeError) as cm:
             foo.decode("B", b"<A><d><true /></d></A>")
 
         self.assertEqual(
@@ -310,7 +310,7 @@ class Asn1ToolsXerTest(Asn1ToolsBaseTest):
         )
 
     def test_utf8_string(self):
-        foo = asn1tools.compile_string(
+        foo = asn1tools_ext.compile_string(
             "Foo DEFINITIONS AUTOMATIC TAGS ::= BEGIN A ::= UTF8String END", "xer"
         )
 
@@ -325,7 +325,7 @@ class Asn1ToolsXerTest(Asn1ToolsBaseTest):
             self.assert_encode_decode_string(foo, type_name, decoded, encoded)
 
     def test_universal_string(self):
-        foo = asn1tools.compile_string(
+        foo = asn1tools_ext.compile_string(
             "Foo DEFINITIONS AUTOMATIC TAGS ::= BEGIN A ::= UniversalString END", "xer"
         )
 
@@ -335,7 +335,7 @@ class Asn1ToolsXerTest(Asn1ToolsBaseTest):
             self.assert_encode_decode(foo, type_name, decoded, encoded)
 
     def test_utc_time(self):
-        foo = asn1tools.compile_string(
+        foo = asn1tools_ext.compile_string(
             "Foo DEFINITIONS AUTOMATIC TAGS ::= BEGIN A ::= UTCTime END", "xer"
         )
 
@@ -348,7 +348,7 @@ class Asn1ToolsXerTest(Asn1ToolsBaseTest):
             self.assert_encode_decode_string(foo, type_name, decoded, encoded)
 
     def test_generalized_time(self):
-        foo = asn1tools.compile_string(
+        foo = asn1tools_ext.compile_string(
             "Foo DEFINITIONS AUTOMATIC TAGS ::= BEGIN A ::= GeneralizedTime END", "xer"
         )
 
@@ -362,7 +362,9 @@ class Asn1ToolsXerTest(Asn1ToolsBaseTest):
             self.assert_encode_decode_string(foo, type_name, decoded, encoded)
 
     def test_any(self):
-        foo = asn1tools.compile_string("Foo DEFINITIONS ::= BEGIN A ::= ANY END", "xer")
+        foo = asn1tools_ext.compile_string(
+            "Foo DEFINITIONS ::= BEGIN A ::= ANY END", "xer"
+        )
 
         with self.assertRaises(NotImplementedError) as cm:
             foo.encode("A", b"")
@@ -375,7 +377,7 @@ class Asn1ToolsXerTest(Asn1ToolsBaseTest):
         self.assertEqual(str(cm.exception), "ANY is not yet implemented.")
 
     def test_foo(self):
-        foo = asn1tools.compile_files(["tests/files/foo.asn"], "xer")
+        foo = asn1tools_ext.compile_files(["tests/files/foo.asn"], "xer")
 
         self.assertEqual(len(foo.types), 2)
         self.assertTrue(foo.types["Question"] is not None)
@@ -404,7 +406,7 @@ class Asn1ToolsXerTest(Asn1ToolsBaseTest):
         self.assertEqual(decoded, decoded_message)
 
         # Encode a question with missing field 'id'.
-        with self.assertRaises(asn1tools.EncodeError) as cm:
+        with self.assertRaises(asn1tools_ext.EncodeError) as cm:
             encoded = foo.encode("Question", {"question": "Is 1+1=3?"})
 
         self.assertEqual(
@@ -413,9 +415,9 @@ class Asn1ToolsXerTest(Asn1ToolsBaseTest):
         )
 
     def test_decode_length(self):
-        foo = asn1tools.compile_files("tests/files/foo.asn", "xer")
+        foo = asn1tools_ext.compile_files("tests/files/foo.asn", "xer")
 
-        with self.assertRaises(asn1tools.DecodeError) as cm:
+        with self.assertRaises(asn1tools_ext.DecodeError) as cm:
             foo.decode_length(b"")
 
         self.assertEqual(
@@ -423,7 +425,7 @@ class Asn1ToolsXerTest(Asn1ToolsBaseTest):
         )
 
     def test_rrc_8_6_0(self):
-        rrc = asn1tools.compile_dict(deepcopy(RRC_8_6_0), "xer")
+        rrc = asn1tools_ext.compile_dict(deepcopy(RRC_8_6_0), "xer")
 
         # Message 1.
         decoded = {
@@ -778,7 +780,7 @@ class Asn1ToolsXerTest(Asn1ToolsBaseTest):
         self.assert_encode_decode_string(rrc, "BCCH-DL-SCH-Message", decoded, encoded)
 
     def test_all_types(self):
-        foo = asn1tools.compile_files("tests/files/all_types.asn", "xer")
+        foo = asn1tools_ext.compile_files("tests/files/all_types.asn", "xer")
 
         datas = [
             ("Boolean", True, b"<Boolean><true /></Boolean>"),
@@ -797,7 +799,7 @@ class Asn1ToolsXerTest(Asn1ToolsBaseTest):
             self.assert_encode_decode_string(foo, type_name, decoded, encoded)
 
     def test_repr_all_types(self):
-        foo = asn1tools.compile_files("tests/files/all_types.asn", "xer")
+        foo = asn1tools_ext.compile_files("tests/files/all_types.asn", "xer")
 
         self.assertEqual(repr(foo.types["Boolean"]), "Boolean(Boolean)")
         self.assertEqual(repr(foo.types["Integer"]), "Integer(Integer)")
@@ -852,7 +854,9 @@ class Asn1ToolsXerTest(Asn1ToolsBaseTest):
         )
 
     def test_all_types_automatic_tags(self):
-        foo = asn1tools.compile_files("tests/files/all_types_automatic_tags.asn", "xer")
+        foo = asn1tools_ext.compile_files(
+            "tests/files/all_types_automatic_tags.asn", "xer"
+        )
 
         datas = [
             (
@@ -866,7 +870,7 @@ class Asn1ToolsXerTest(Asn1ToolsBaseTest):
             self.assert_encode_decode_string(foo, type_name, decoded, encoded)
 
     def test_indent(self):
-        foo = asn1tools.compile_string(
+        foo = asn1tools_ext.compile_string(
             "Foo DEFINITIONS AUTOMATIC TAGS ::= "
             "BEGIN "
             "A ::= SEQUENCE { "
@@ -905,7 +909,7 @@ class Asn1ToolsXerTest(Asn1ToolsBaseTest):
 
         """
 
-        foo = asn1tools.compile_string(
+        foo = asn1tools_ext.compile_string(
             "Foo DEFINITIONS AUTOMATIC TAGS ::= BEGIN "
             "A ::= SEQUENCE { "
             "  a B "
@@ -923,7 +927,7 @@ class Asn1ToolsXerTest(Asn1ToolsBaseTest):
         self.assert_encode_decode_string(foo, "A", decoded, encoded)
 
     def test_not_support_decode_with_length(self):
-        foo = asn1tools.compile_string(
+        foo = asn1tools_ext.compile_string(
             "Foo DEFINITIONS AUTOMATIC TAGS ::= BEGIN A ::= OCTET STRING END", "xer"
         )
 

@@ -1,21 +1,17 @@
 import unittest
 from datetime import datetime
 from datetime import timedelta
+from datetime import timezone
 
-import asn1tools
-from asn1tools.codecs import utc_time_to_datetime
-from asn1tools.codecs import utc_time_from_datetime
-from asn1tools.codecs import generalized_time_to_datetime
-from asn1tools.codecs import generalized_time_from_datetime
-from asn1tools.codecs import restricted_utc_time_to_datetime
-from asn1tools.codecs import restricted_utc_time_from_datetime
-from asn1tools.codecs import restricted_generalized_time_to_datetime
-from asn1tools.codecs import restricted_generalized_time_from_datetime
-
-try:
-    from datetime import timezone
-except ImportError:
-    from asn1tools.compat import timezone
+import asn1tools_ext
+from asn1tools_ext.codecs import utc_time_to_datetime
+from asn1tools_ext.codecs import utc_time_from_datetime
+from asn1tools_ext.codecs import generalized_time_to_datetime
+from asn1tools_ext.codecs import generalized_time_from_datetime
+from asn1tools_ext.codecs import restricted_utc_time_to_datetime
+from asn1tools_ext.codecs import restricted_utc_time_from_datetime
+from asn1tools_ext.codecs import restricted_generalized_time_to_datetime
+from asn1tools_ext.codecs import restricted_generalized_time_from_datetime
 
 
 def tzinfo(hours, minutes=0):
@@ -175,7 +171,7 @@ class Asn1ToolsUtilsTest(unittest.TestCase):
         ]
 
         for utc_time in datas:
-            with self.assertRaises(asn1tools.Error) as cm:
+            with self.assertRaises(asn1tools_ext.Error) as cm:
                 utc_time_to_datetime(utc_time)
 
             self.assertEqual(
@@ -193,7 +189,7 @@ class Asn1ToolsUtilsTest(unittest.TestCase):
         ]
 
         for utc_time in datas:
-            with self.assertRaises(asn1tools.Error) as cm:
+            with self.assertRaises(asn1tools_ext.Error) as cm:
                 restricted_utc_time_to_datetime(utc_time)
 
             self.assertEqual(
@@ -211,7 +207,7 @@ class Asn1ToolsUtilsTest(unittest.TestCase):
         ]
 
         for generalized_time in datas:
-            with self.assertRaises(asn1tools.Error) as cm:
+            with self.assertRaises(asn1tools_ext.Error) as cm:
                 generalized_time_to_datetime(generalized_time)
 
             self.assertEqual(
@@ -233,7 +229,7 @@ class Asn1ToolsUtilsTest(unittest.TestCase):
         ]
 
         for generalized_time in datas:
-            with self.assertRaises(asn1tools.Error) as cm:
+            with self.assertRaises(asn1tools_ext.Error) as cm:
                 restricted_generalized_time_to_datetime(generalized_time)
 
             self.assertEqual(

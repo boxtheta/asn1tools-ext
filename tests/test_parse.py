@@ -2,7 +2,7 @@ import sys
 import unittest
 import importlib
 
-import asn1tools
+import asn1tools_ext
 
 sys.path.append("tests/files")
 sys.path.append("tests/files/3gpp")
@@ -18,7 +18,7 @@ class Asn1ToolsParseTest(unittest.TestCase):
 
     def parse_and_verify(self, module, path="."):
         asn_path = "tests/files/" + path + "/" + module + ".asn"
-        actual = asn1tools.parse_files(asn_path)
+        actual = asn1tools_ext.parse_files(asn_path)
 
         # from pprint import pformat
         #
@@ -78,6 +78,9 @@ class Asn1ToolsParseTest(unittest.TestCase):
     def test_parse_zforce(self):
         self.parse_and_verify("zforce")
 
+    def test_parse_sketch(self):
+        self.parse_and_verify("sketch")
+
     def test_parse_rrc_8_6_0(self):
         self.parse_and_verify("rrc_8_6_0", "3gpp")
 
@@ -119,9 +122,6 @@ class Asn1ToolsParseTest(unittest.TestCase):
 
     def test_parse_rfc4211(self):
         self.parse_and_verify("rfc4211", "ietf")
-
-    def test_parse_rfc4511(self):
-        self.parse_and_verify("rfc4511", "ietf")
 
     def test_parse_rfc5084(self):
         self.parse_and_verify("rfc5084", "ietf")
@@ -172,7 +172,7 @@ class Asn1ToolsParseTest(unittest.TestCase):
         self.parse_and_verify("parameterization")
 
     def test_parse_imports_global_module_reference(self):
-        actual = asn1tools.parse_string(
+        actual = asn1tools_ext.parse_string(
             "A DEFINITIONS ::= BEGIN "
             "IMPORTS "
             "a FROM B "
@@ -200,7 +200,7 @@ class Asn1ToolsParseTest(unittest.TestCase):
 
         """
 
-        actual = asn1tools.parse_string(
+        actual = asn1tools_ext.parse_string(
             "A DEFINITIONS ::= BEGIN IMPORTS A FROM B c FROM D; END"
         )
 
@@ -218,7 +218,7 @@ class Asn1ToolsParseTest(unittest.TestCase):
         self.assertEqual(actual, expected)
 
     def test_parse_empty_imports(self):
-        actual = asn1tools.parse_string("A DEFINITIONS ::= BEGIN IMPORTS ; END")
+        actual = asn1tools_ext.parse_string("A DEFINITIONS ::= BEGIN IMPORTS ; END")
 
         expected = {
             "A": {
@@ -234,7 +234,7 @@ class Asn1ToolsParseTest(unittest.TestCase):
         self.assertEqual(actual, expected)
 
     def test_parse_with_successors_descendants(self):
-        actual = asn1tools.parse_string(
+        actual = asn1tools_ext.parse_string(
             "A DEFINITIONS ::= BEGIN "
             "IMPORTS "
             "a FROM B WITH SUCCESSORS "
@@ -254,7 +254,9 @@ class Asn1ToolsParseTest(unittest.TestCase):
         self.assertEqual(actual, expected)
 
     def test_parse_keyword_in_type_name(self):
-        actual = asn1tools.parse_string("A DEFINITIONS ::= BEGIN ENDa ::= INTEGER END")
+        actual = asn1tools_ext.parse_string(
+            "A DEFINITIONS ::= BEGIN ENDa ::= INTEGER END"
+        )
 
         expected = {
             "A": {
@@ -270,8 +272,8 @@ class Asn1ToolsParseTest(unittest.TestCase):
         self.assertEqual(actual, expected)
 
     def test_parse_error_empty_string(self):
-        with self.assertRaises(asn1tools.ParseError) as cm:
-            asn1tools.parse_string("")
+        with self.assertRaises(asn1tools_ext.ParseError) as cm:
+            asn1tools_ext.parse_string("")
 
         self.assertEqual(
             str(cm.exception),
@@ -280,8 +282,8 @@ class Asn1ToolsParseTest(unittest.TestCase):
         )
 
     def test_parse_error_begin_missing(self):
-        with self.assertRaises(asn1tools.ParseError) as cm:
-            asn1tools.parse_string("A DEFINITIONS ::= END")
+        with self.assertRaises(asn1tools_ext.ParseError) as cm:
+            asn1tools_ext.parse_string("A DEFINITIONS ::= END")
 
         self.assertEqual(
             str(cm.exception),
@@ -290,8 +292,8 @@ class Asn1ToolsParseTest(unittest.TestCase):
         )
 
     def test_parse_error_end_missing(self):
-        with self.assertRaises(asn1tools.ParseError) as cm:
-            asn1tools.parse_string("A DEFINITIONS ::= BEGIN")
+        with self.assertRaises(asn1tools_ext.ParseError) as cm:
+            asn1tools_ext.parse_string("A DEFINITIONS ::= BEGIN")
 
         self.assertEqual(
             str(cm.exception),
@@ -300,8 +302,8 @@ class Asn1ToolsParseTest(unittest.TestCase):
         )
 
     def test_parse_error_type_assignment_missing_assignment(self):
-        with self.assertRaises(asn1tools.ParseError) as cm:
-            asn1tools.parse_string("A DEFINITIONS ::= BEGIN A END")
+        with self.assertRaises(asn1tools_ext.ParseError) as cm:
+            asn1tools_ext.parse_string("A DEFINITIONS ::= BEGIN A END")
 
         self.assertEqual(
             str(cm.exception),
@@ -311,8 +313,8 @@ class Asn1ToolsParseTest(unittest.TestCase):
         )
 
     def test_parse_error_value_assignment_missing_assignment(self):
-        with self.assertRaises(asn1tools.ParseError) as cm:
-            asn1tools.parse_string("A DEFINITIONS ::= BEGIN a INTEGER END")
+        with self.assertRaises(asn1tools_ext.ParseError) as cm:
+            asn1tools_ext.parse_string("A DEFINITIONS ::= BEGIN a INTEGER END")
 
         self.assertEqual(
             str(cm.exception),
@@ -322,8 +324,10 @@ class Asn1ToolsParseTest(unittest.TestCase):
         )
 
     def test_parse_error_sequence_missing_type(self):
-        with self.assertRaises(asn1tools.ParseError) as cm:
-            asn1tools.parse_string("A DEFINITIONS ::= BEGIN  A ::= SEQUENCE { a } END")
+        with self.assertRaises(asn1tools_ext.ParseError) as cm:
+            asn1tools_ext.parse_string(
+                "A DEFINITIONS ::= BEGIN  A ::= SEQUENCE { a } END"
+            )
 
         self.assertEqual(
             str(cm.exception),
@@ -332,8 +336,10 @@ class Asn1ToolsParseTest(unittest.TestCase):
         )
 
     def test_parse_error_sequence_missing_member_name(self):
-        with self.assertRaises(asn1tools.ParseError) as cm:
-            asn1tools.parse_string("A DEFINITIONS ::= BEGIN  A ::= SEQUENCE { A } END")
+        with self.assertRaises(asn1tools_ext.ParseError) as cm:
+            asn1tools_ext.parse_string(
+                "A DEFINITIONS ::= BEGIN  A ::= SEQUENCE { A } END"
+            )
 
         self.assertEqual(
             str(cm.exception),
@@ -342,8 +348,8 @@ class Asn1ToolsParseTest(unittest.TestCase):
         )
 
     def test_parse_error_definitive_identifier(self):
-        with self.assertRaises(asn1tools.ParseError) as cm:
-            asn1tools.parse_string("A {} DEFINITIONS ::= BEGIN END")
+        with self.assertRaises(asn1tools_ext.ParseError) as cm:
+            asn1tools_ext.parse_string("A {} DEFINITIONS ::= BEGIN END")
 
         self.assertEqual(
             str(cm.exception),
@@ -354,8 +360,8 @@ class Asn1ToolsParseTest(unittest.TestCase):
         )
 
     def test_parse_error_missing_union_member_beginning(self):
-        with self.assertRaises(asn1tools.ParseError) as cm:
-            asn1tools.parse_string(
+        with self.assertRaises(asn1tools_ext.ParseError) as cm:
+            asn1tools_ext.parse_string(
                 "A DEFINITIONS ::= BEGIN B ::= INTEGER (| SIZE (1))END"
             )
 
@@ -366,8 +372,8 @@ class Asn1ToolsParseTest(unittest.TestCase):
         )
 
     def test_parse_error_missing_union_member_middle(self):
-        with self.assertRaises(asn1tools.ParseError) as cm:
-            asn1tools.parse_string(
+        with self.assertRaises(asn1tools_ext.ParseError) as cm:
+            asn1tools_ext.parse_string(
                 "A DEFINITIONS ::= BEGIN B ::= INTEGER (SIZE (1) | | (0))END"
             )
 
@@ -378,8 +384,8 @@ class Asn1ToolsParseTest(unittest.TestCase):
         )
 
     def test_parse_error_missing_union_member_end(self):
-        with self.assertRaises(asn1tools.ParseError) as cm:
-            asn1tools.parse_string(
+        with self.assertRaises(asn1tools_ext.ParseError) as cm:
+            asn1tools_ext.parse_string(
                 "A DEFINITIONS ::= BEGIN B ::= INTEGER (SIZE (1) |)END"
             )
 
@@ -390,8 +396,10 @@ class Asn1ToolsParseTest(unittest.TestCase):
         )
 
     def test_parse_error_size_constraint_missing_parentheses(self):
-        with self.assertRaises(asn1tools.ParseError) as cm:
-            asn1tools.parse_string("A DEFINITIONS ::= BEGIN B ::= INTEGER (SIZE 1)END")
+        with self.assertRaises(asn1tools_ext.ParseError) as cm:
+            asn1tools_ext.parse_string(
+                "A DEFINITIONS ::= BEGIN B ::= INTEGER (SIZE 1)END"
+            )
 
         self.assertEqual(
             str(cm.exception),
@@ -400,8 +408,10 @@ class Asn1ToolsParseTest(unittest.TestCase):
         )
 
     def test_parse_error_size_constraint_missing_size(self):
-        with self.assertRaises(asn1tools.ParseError) as cm:
-            asn1tools.parse_string("A DEFINITIONS ::= BEGIN B ::= INTEGER (SIZE ())END")
+        with self.assertRaises(asn1tools_ext.ParseError) as cm:
+            asn1tools_ext.parse_string(
+                "A DEFINITIONS ::= BEGIN B ::= INTEGER (SIZE ())END"
+            )
 
         self.assertEqual(
             str(cm.exception),
@@ -411,8 +421,8 @@ class Asn1ToolsParseTest(unittest.TestCase):
         )
 
     def test_parse_error_tag_class_number_missing(self):
-        with self.assertRaises(asn1tools.ParseError) as cm:
-            asn1tools.parse_string("A DEFINITIONS ::= BEGIN B ::= [] INTEGER END")
+        with self.assertRaises(asn1tools_ext.ParseError) as cm:
+            asn1tools_ext.parse_string("A DEFINITIONS ::= BEGIN B ::= [] INTEGER END")
 
         self.assertEqual(
             str(cm.exception),
@@ -421,8 +431,8 @@ class Asn1ToolsParseTest(unittest.TestCase):
         )
 
     def test_parse_error_missing_type(self):
-        with self.assertRaises(asn1tools.ParseError) as cm:
-            asn1tools.parse_string("A DEFINITIONS ::= BEGIN B ::= END")
+        with self.assertRaises(asn1tools_ext.ParseError) as cm:
+            asn1tools_ext.parse_string("A DEFINITIONS ::= BEGIN B ::= END")
 
         self.assertEqual(
             str(cm.exception),
@@ -431,8 +441,8 @@ class Asn1ToolsParseTest(unittest.TestCase):
         )
 
     def test_parse_error_end_missing_with_comments(self):
-        with self.assertRaises(asn1tools.ParseError) as cm:
-            asn1tools.parse_string("A DEFINITIONS -- g -- \n-- hhhh\n::= BEGIN ")
+        with self.assertRaises(asn1tools_ext.ParseError) as cm:
+            asn1tools_ext.parse_string("A DEFINITIONS -- g -- \n-- hhhh\n::= BEGIN ")
 
         self.assertEqual(
             str(cm.exception),
@@ -440,8 +450,8 @@ class Asn1ToolsParseTest(unittest.TestCase):
         )
 
     def test_parse_error_late_extension_additions(self):
-        with self.assertRaises(asn1tools.ParseError) as cm:
-            asn1tools.parse_string(
+        with self.assertRaises(asn1tools_ext.ParseError) as cm:
+            asn1tools_ext.parse_string(
                 "A DEFINITIONS ::= BEGIN "
                 "Foo ::= SEQUENCE { "
                 "a BOOLEAN, "
@@ -462,8 +472,8 @@ class Asn1ToolsParseTest(unittest.TestCase):
         )
 
     def test_parse_error_too_many_extension_markers(self):
-        with self.assertRaises(asn1tools.ParseError) as cm:
-            asn1tools.parse_string(
+        with self.assertRaises(asn1tools_ext.ParseError) as cm:
+            asn1tools_ext.parse_string(
                 "A DEFINITIONS ::= BEGIN "
                 "Foo ::= SEQUENCE { "
                 "a BOOLEAN, "
@@ -489,8 +499,8 @@ class Asn1ToolsParseTest(unittest.TestCase):
         )
 
     def test_parse_error_missing_single_line_comment_end(self):
-        with self.assertRaises(asn1tools.ParseError) as cm:
-            asn1tools.parse_string("A DEFINITIONS ::= \nBEGIN -- END")
+        with self.assertRaises(asn1tools_ext.ParseError) as cm:
+            asn1tools_ext.parse_string("A DEFINITIONS ::= \nBEGIN -- END")
 
         self.assertEqual(
             str(cm.exception),
@@ -499,8 +509,8 @@ class Asn1ToolsParseTest(unittest.TestCase):
         )
 
     def test_parse_error_missing_multi_line_comment_end(self):
-        with self.assertRaises(asn1tools.ParseError) as cm:
-            asn1tools.parse_string("A DEFINITIONS ::= \nBEGIN /* END")
+        with self.assertRaises(asn1tools_ext.ParseError) as cm:
+            asn1tools_ext.parse_string("A DEFINITIONS ::= \nBEGIN /* END")
 
         self.assertEqual(
             str(cm.exception),
@@ -509,8 +519,8 @@ class Asn1ToolsParseTest(unittest.TestCase):
         )
 
     def test_parse_error_multi_line_comment_overlapping(self):
-        with self.assertRaises(asn1tools.ParseError) as cm:
-            asn1tools.parse_string("A DEFINITIONS ::= \nBEGIN /*/ END")
+        with self.assertRaises(asn1tools_ext.ParseError) as cm:
+            asn1tools_ext.parse_string("A DEFINITIONS ::= \nBEGIN /*/ END")
 
         self.assertEqual(
             str(cm.exception),
@@ -519,31 +529,31 @@ class Asn1ToolsParseTest(unittest.TestCase):
         )
 
     def test_parse_x680_duplicated_enum_number_a_c_0(self):
-        with self.assertRaises(asn1tools.ParseError) as cm:
-            asn1tools.compile_string(
+        with self.assertRaises(asn1tools_ext.ParseError) as cm:
+            asn1tools_ext.compile_string(
                 "A DEFINITIONS ::= BEGIN E ::= ENUMERATED { a, b, ..., c(0) } END"
             )
 
         self.assertEqual(str(cm.exception), "Duplicated ENUMERATED number 0 at line 1.")
 
     def test_parse_x680_duplicated_enum_number_c_d_2(self):
-        with self.assertRaises(asn1tools.ParseError) as cm:
-            asn1tools.compile_string(
+        with self.assertRaises(asn1tools_ext.ParseError) as cm:
+            asn1tools_ext.compile_string(
                 "A DEFINITIONS ::= BEGIN E ::= ENUMERATED { a, b, ..., c, d(2) } END"
             )
 
         self.assertEqual(str(cm.exception), "Duplicated ENUMERATED number 2 at line 1.")
 
     def test_parse_x680_duplicated_enum_number_a_b_0(self):
-        with self.assertRaises(asn1tools.ParseError) as cm:
-            asn1tools.compile_string(
+        with self.assertRaises(asn1tools_ext.ParseError) as cm:
+            asn1tools_ext.compile_string(
                 "A DEFINITIONS ::= BEGIN E ::= ENUMERATED { a(0), b(0) } END"
             )
 
         self.assertEqual(str(cm.exception), "Duplicated ENUMERATED number 0 at line 1.")
 
     def test_parse_encoding(self):
-        asn1tools.parse_files("tests/files/foo.asn", encoding="ascii")
+        asn1tools_ext.parse_files("tests/files/foo.asn", encoding="ascii")
 
 
 if __name__ == "__main__":

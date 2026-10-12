@@ -65,7 +65,7 @@ $
 from __future__ import print_function
 import os
 from binascii import hexlify
-import asn1tools
+import asn1tools_ext
 from foo_pb2 import Question
 
 SCRIPT_DIR = os.path.dirname(os.path.realpath(__file__))
@@ -85,7 +85,7 @@ print("Question to encode:", question)
 
 # Encode and decode the question once for each codec.
 for codec in ["ber", "der", "jer", "oer", "per", "uper", "xer"]:
-    foo = asn1tools.compile_files(FOO_ASN_PATH, codec)
+    foo = asn1tools_ext.compile_files(FOO_ASN_PATH, codec)
     encoded = foo.encode("Question", question)
     decoded = foo.decode("Question", encoded)
 

@@ -7,11 +7,11 @@ from copy import deepcopy
 from datetime import datetime
 from .utils import Asn1ToolsBaseTest
 
-import asn1tools
-from asn1tools.codecs import restricted_utc_time_to_datetime as ut2dt
-from asn1tools.codecs import restricted_generalized_time_to_datetime as gt2dt
-from asn1tools.compat import timezone
-from asn1tools.compat import timedelta
+import asn1tools_ext
+from asn1tools_ext.codecs import restricted_utc_time_to_datetime as ut2dt
+from asn1tools_ext.codecs import restricted_generalized_time_to_datetime as gt2dt
+from datetime import timezone
+from datetime import timedelta
 
 sys.path.append("tests/files/ietf")
 
@@ -22,7 +22,7 @@ class Asn1ToolsDerTest(Asn1ToolsBaseTest):
     maxDiff = None
 
     def test_integer(self):
-        foo = asn1tools.compile_string(
+        foo = asn1tools_ext.compile_string(
             "Foo DEFINITIONS ::= BEGIN A ::= INTEGER END", "der"
         )
 
@@ -48,7 +48,7 @@ class Asn1ToolsDerTest(Asn1ToolsBaseTest):
             self.assert_encode_decode(foo, type_name, decoded, encoded)
 
     def test_external(self):
-        foo = asn1tools.compile_string(
+        foo = asn1tools_ext.compile_string(
             "Foo DEFINITIONS AUTOMATIC TAGS ::= BEGIN A ::= EXTERNAL END", "der"
         )
 
@@ -60,7 +60,7 @@ class Asn1ToolsDerTest(Asn1ToolsBaseTest):
             self.assert_encode_decode(foo, type_name, decoded, encoded)
 
     def test_real(self):
-        foo = asn1tools.compile_string(
+        foo = asn1tools_ext.compile_string(
             "Foo DEFINITIONS AUTOMATIC TAGS ::= BEGIN A ::= REAL END"
         )
 
@@ -77,7 +77,7 @@ class Asn1ToolsDerTest(Asn1ToolsBaseTest):
         self.assertEqual(foo.decode("A", b"\x09\x05\x03\x31\x2e\x45\x32"), 100.0)
 
     def test_bit_string(self):
-        foo = asn1tools.compile_string(
+        foo = asn1tools_ext.compile_string(
             "Foo DEFINITIONS AUTOMATIC TAGS ::= "
             "BEGIN "
             "A ::= BIT STRING "
@@ -164,7 +164,7 @@ class Asn1ToolsDerTest(Asn1ToolsBaseTest):
             self.assertEqual(foo.decode(type_name, encoded), decoded_2)
 
     def test_octet_string(self):
-        foo = asn1tools.compile_string(
+        foo = asn1tools_ext.compile_string(
             "Foo DEFINITIONS AUTOMATIC TAGS ::= "
             "BEGIN "
             "A ::= SEQUENCE { "
@@ -205,7 +205,7 @@ class Asn1ToolsDerTest(Asn1ToolsBaseTest):
             self.assertEqual(foo.decode(type_name, encoded), decoded_2)
 
     def test_set(self):
-        foo = asn1tools.compile_string(
+        foo = asn1tools_ext.compile_string(
             "Foo DEFINITIONS IMPLICIT TAGS ::= "
             "BEGIN "
             "A ::= SET { "
@@ -229,7 +229,7 @@ class Asn1ToolsDerTest(Asn1ToolsBaseTest):
             self.assert_encode_decode(foo, type_name, decoded, encoded)
 
     def test_utf8_string(self):
-        foo = asn1tools.compile_string(
+        foo = asn1tools_ext.compile_string(
             "Foo DEFINITIONS AUTOMATIC TAGS ::= BEGIN A ::= UTF8String END", "der"
         )
 
@@ -242,7 +242,7 @@ class Asn1ToolsDerTest(Asn1ToolsBaseTest):
             self.assert_encode_decode(foo, type_name, decoded, encoded)
 
     def test_graphic_string(self):
-        foo = asn1tools.compile_string(
+        foo = asn1tools_ext.compile_string(
             "Foo DEFINITIONS AUTOMATIC TAGS ::= BEGIN A ::= GraphicString END"
         )
 
@@ -252,7 +252,7 @@ class Asn1ToolsDerTest(Asn1ToolsBaseTest):
             self.assert_encode_decode(foo, type_name, decoded, encoded)
 
     def test_universal_string(self):
-        foo = asn1tools.compile_string(
+        foo = asn1tools_ext.compile_string(
             "Foo DEFINITIONS AUTOMATIC TAGS ::= BEGIN A ::= UniversalString END", "der"
         )
 
@@ -265,7 +265,7 @@ class Asn1ToolsDerTest(Asn1ToolsBaseTest):
             self.assert_encode_decode(foo, type_name, decoded, encoded)
 
     def test_utc_time(self):
-        foo = asn1tools.compile_string(
+        foo = asn1tools_ext.compile_string(
             "Foo DEFINITIONS AUTOMATIC TAGS ::= BEGIN A ::= UTCTime END", "der"
         )
 
@@ -286,7 +286,7 @@ class Asn1ToolsDerTest(Asn1ToolsBaseTest):
             self.assert_encode_decode(foo, type_name, decoded, encoded)
 
     def test_generalized_time(self):
-        foo = asn1tools.compile_string(
+        foo = asn1tools_ext.compile_string(
             "Foo DEFINITIONS AUTOMATIC TAGS ::= BEGIN A ::= GeneralizedTime END", "der"
         )
 
@@ -312,7 +312,7 @@ class Asn1ToolsDerTest(Asn1ToolsBaseTest):
             self.assert_encode_decode(foo, type_name, decoded, encoded)
 
     def test_all_types(self):
-        all_types = asn1tools.compile_files("tests/files/all_types.asn", "der")
+        all_types = asn1tools_ext.compile_files("tests/files/all_types.asn", "der")
 
         datas = [
             ("Boolean", True, b"\x01\x01\xff"),
@@ -355,7 +355,7 @@ class Asn1ToolsDerTest(Asn1ToolsBaseTest):
         )
 
     def test_repr_all_types(self):
-        all_types = asn1tools.compile_files("tests/files/all_types.asn", "der")
+        all_types = asn1tools_ext.compile_files("tests/files/all_types.asn", "der")
 
         self.assertEqual(repr(all_types.types["Boolean"]), "Boolean(Boolean)")
         self.assertEqual(repr(all_types.types["Integer"]), "Integer(Integer)")
@@ -416,7 +416,7 @@ class Asn1ToolsDerTest(Asn1ToolsBaseTest):
         )
 
     def test_all_types_automatic_tags(self):
-        all_types = asn1tools.compile_files(
+        all_types = asn1tools_ext.compile_files(
             "tests/files/all_types_automatic_tags.asn", "der"
         )
 
@@ -432,7 +432,7 @@ class Asn1ToolsDerTest(Asn1ToolsBaseTest):
             self.assert_encode_decode(all_types, type_name, decoded, encoded)
 
     def test_decode_length(self):
-        foo = asn1tools.compile_files("tests/files/foo.asn", "der")
+        foo = asn1tools_ext.compile_files("tests/files/foo.asn", "der")
 
         # The length can be decoded.
         datas = [
@@ -454,7 +454,7 @@ class Asn1ToolsDerTest(Asn1ToolsBaseTest):
             self.assertIsNone(foo.decode_length(encoded))
 
     def test_long_tag(self):
-        foo = asn1tools.compile_string(
+        foo = asn1tools_ext.compile_string(
             "Foo DEFINITIONS IMPLICIT TAGS ::= BEGIN "
             "A ::= [31] INTEGER "
             "B ::= [500] INTEGER "
@@ -467,7 +467,7 @@ class Asn1ToolsDerTest(Asn1ToolsBaseTest):
             self.assert_encode_decode(foo, type_name, decoded, encoded)
 
     def test_rfc5280(self):
-        rfc5280 = asn1tools.compile_dict(deepcopy(RFC5280), "der")
+        rfc5280 = asn1tools_ext.compile_dict(deepcopy(RFC5280), "der")
 
         decoded = {
             "tbsCertificate": {
