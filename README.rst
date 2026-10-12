@@ -169,6 +169,12 @@ Contributing
 
       uv run python -m unittest
 
+#. Run the type checker.
+
+   .. code-block:: text
+
+      uv run mypy
+
 #. Create a pull request.
 
 Specifications

@@ -30,3 +30,17 @@ build-backend = "uv_build"
 [tool.uv.build-backend]
 # asn1tools is an alias of asn1tools_ext for existing code.
 module-name = ["asn1tools_ext", "asn1tools"]
+
+[tool.mypy]
+files = ["src"]
+python_version = "3.13"
+check_untyped_defs = true
+
+[[tool.mypy.overrides]]
+module = ["bitstruct.*"]
+ignore_missing_imports = true
+
+[dependency-groups]
+dev = [
+    "mypy>=2.4.0",
+]
