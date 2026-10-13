@@ -4,6 +4,7 @@ import binascii
 import datetime
 import sys
 import time
+import typing
 from xml.etree import ElementTree
 
 from asn1tools_ext.codecs.codec import Codec
@@ -267,14 +268,14 @@ class BitString(Type):
             decoded = b""
         else:
             number_of_bits = len(encoded)
-            decoded = int(encoded, 2)
-            decoded |= 0x80 << number_of_bits
+            value = int(encoded, 2)
+            value |= 0x80 << number_of_bits
             rest = number_of_bits % 8
 
             if rest != 0:
-                decoded <<= 8 - rest
+                value <<= 8 - rest
 
-            decoded = binascii.unhexlify(hex(decoded).rstrip("L")[4:])
+            decoded = binascii.unhexlify(hex(value).rstrip("L")[4:])
 
         return (decoded, number_of_bits)
 
@@ -611,7 +612,7 @@ class Recursive(compiler.Recursive, Type):
         super(Recursive, self).__init__(name, "RECURSIVE")
         self.type_name = type_name
         self.module_name = module_name
-        self._inner = None
+        self._inner: typing.Any = None
 
     def set_inner_type(self, inner):
         self._inner = inner
@@ -660,6 +661,7 @@ class Compiler(compiler.Compiler):
         module_name = self.get_module_name(type_descriptor, module_name)
         type_name = type_descriptor["type"]
 
+        compiled: Type
         if type_name == "SEQUENCE":
             members, _ = self.compile_members(type_descriptor["members"], module_name)
             compiled = Sequence(name, members)

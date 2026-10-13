@@ -4,6 +4,7 @@ import binascii
 import datetime
 import string
 from operator import attrgetter, itemgetter
+import typing
 
 from asn1tools_ext.codecs.codec import Codec
 
@@ -264,11 +265,12 @@ class Encoder(object):
             number_of_bits += number_of_alignment_bits
 
         value |= 0x80 << number_of_bits
-        value = hex(value)[4:].rstrip("L")
 
-        return bytearray(binascii.unhexlify(value))
+        return bytearray(binascii.unhexlify(hex(value)[4:].rstrip("L")))
 
     def append_length_determinant(self, length):
+        encoded: bytes | bytearray
+
         if length < 128:
             encoded = bytearray([length])
         elif length < 16384:
@@ -526,6 +528,7 @@ class Type(BaseType):
 
 
 class KnownMultiplierStringType(Type):
+    ALPHABET: bytearray | str
     ENCODING = "ascii"
     PERMITTED_ALPHABET = PermittedAlphabet({}, {})
 
@@ -1813,7 +1816,7 @@ class Recursive(compiler.Recursive, Type):
         super(Recursive, self).__init__(name, "RECURSIVE")
         self.type_name = type_name
         self.module_name = module_name
-        self._inner = None
+        self._inner: typing.Any = None
 
     def set_inner_type(self, inner):
         self._inner = inner
@@ -1861,6 +1864,7 @@ class Compiler(compiler.Compiler):
         module_name = self.get_module_name(type_descriptor, module_name)
         type_name = type_descriptor["type"]
 
+        compiled: Type
         if type_name == "SEQUENCE":
             compiled = Sequence(
                 name, *self.compile_members(type_descriptor["members"], module_name)
@@ -2016,9 +2020,9 @@ class Compiler(compiler.Compiler):
     def compile_members(
         self, members, module_name, sort_by_tag=False, flat_additions=False
     ):
-        compiled_members = []
+        compiled_members: list[typing.Any] = []
         in_extension = False
-        additions = None
+        additions: list[typing.Any] | None = None
 
         for member in members:
             if member == EXTENSION_MARKER:
@@ -2070,9 +2074,9 @@ class Compiler(compiler.Compiler):
             else:
                 value += item
 
-        value = sorted(value)
-        encode_map = {ord(v): i for i, v in enumerate(value)}
-        decode_map = {i: ord(v) for i, v in enumerate(value)}
+        characters = sorted(value)
+        encode_map = {ord(v): i for i, v in enumerate(characters)}
+        decode_map = {i: ord(v) for i, v in enumerate(characters)}
 
         return PermittedAlphabet(encode_map, decode_map)
 

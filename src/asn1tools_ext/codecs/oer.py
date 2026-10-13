@@ -5,6 +5,7 @@ import datetime
 import struct
 from copy import copy
 from operator import attrgetter
+import typing
 
 from asn1tools_ext.codecs.codec import Codec
 
@@ -101,9 +102,8 @@ class Encoder(object):
 
         data = self.value
         data |= 0x80 << self.number_of_bits
-        data = hex(data)[4:].rstrip("L")
 
-        return bytearray(binascii.unhexlify(data))
+        return bytearray(binascii.unhexlify(hex(data)[4:].rstrip("L")))
 
     def append_length_determinant(self, value):
         if value < 128:
@@ -596,7 +596,7 @@ class Real(Type):
         super(Real, self).__init__(name, "REAL", Tag.REAL)
 
         if with_components is None:
-            self.length = None
+            self.length: typing.Any = None
             self.fmt = None
         else:
             mantissa, base, exponent = self.unpack_with_components(with_components)
@@ -853,7 +853,7 @@ class Choice(Type):
         super(Choice, self).__init__(name, "CHOICE", None)
         self.root_members = root_members
         self.name_to_root_member = {member.name: member for member in root_members}
-        self.tag_to_root_member = {}
+        self.tag_to_root_member: dict[typing.Any, typing.Any] = {}
         self.add_tags(self.tag_to_root_member, root_members)
 
         if additions is None:
@@ -865,7 +865,7 @@ class Choice(Type):
         self.additions = additions
 
         self.name_to_addition = {member.name: member for member in additions}
-        self.tag_to_addition = {}
+        self.tag_to_addition: dict[typing.Any, typing.Any] = {}
         self.add_tags(self.tag_to_addition, additions)
 
     @property
@@ -1139,7 +1139,7 @@ class Recursive(compiler.Recursive, Type):
         self.module_name = module_name
         self.tag_number = None
         self.tag_flags = None
-        self.inner = None
+        self.inner: typing.Any = None
 
     def set_inner_type(self, inner):
         self.inner = copy(inner)
@@ -1186,6 +1186,7 @@ class Compiler(compiler.Compiler):
         module_name = self.get_module_name(type_descriptor, module_name)
         type_name = type_descriptor["type"]
 
+        compiled: Type
         if type_name == "SEQUENCE":
             compiled = Sequence(
                 name, *self.compile_members(type_descriptor["members"], module_name)
@@ -1323,9 +1324,9 @@ class Compiler(compiler.Compiler):
         return compiled
 
     def compile_members(self, members, module_name, sort_by_tag=False):
-        compiled_members = []
+        compiled_members: list[typing.Any] = []
         in_extension = False
-        additions = None
+        additions: list[typing.Any] | None = None
 
         for member in members:
             if member == EXTENSION_MARKER:

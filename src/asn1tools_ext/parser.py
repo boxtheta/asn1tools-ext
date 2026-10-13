@@ -151,8 +151,8 @@ def convert_table(tokens):
 
 def convert_enum_values(string, location, tokens):
     number = 0
-    values = []
-    used_numbers = []
+    values: list[Any] = []
+    used_numbers: list[Any] = []
     root, extension = tokens
     root = root.asList()
     extension = extension.asList()
@@ -214,6 +214,8 @@ def convert_enum_values(string, location, tokens):
 
 
 def convert_tag(tokens):
+    tag: dict[str, Any]
+
     if len(tokens) > 0:
         if len(tokens[0]) == 1:
             tag = {"number": int(tokens[0][0])}
@@ -306,7 +308,7 @@ def convert_constraint(_s, _l, tokens):
 
 
 def convert_members(tokens):
-    members = []
+    members: list[Any] = []
 
     for member_tokens in tokens:
         if member_tokens in [["..."], "..."]:
@@ -425,7 +427,7 @@ def convert_defined_type(_s, _l, tokens):
 
 def convert_integer_type(_s, _l, tokens):
     tokens = tokens.asList()
-    compiled = {"type": "INTEGER"}
+    compiled: dict[str, Any] = {"type": "INTEGER"}
 
     if tokens[1]:
         compiled["named-numbers"] = {item[0]: item[2] for item in tokens[1]}
@@ -457,7 +459,7 @@ def convert_object_identifier_type(_s, _l, _tokens):
 
 
 def convert_bit_string_type(_s, _l, tokens):
-    converted_type = {"type": "BIT STRING"}
+    converted_type: dict[str, Any] = {"type": "BIT STRING"}
 
     named_bit_list = tokens.asList()[1]
 
@@ -489,11 +491,9 @@ def convert_actual_parameter_list(_s, _l, tokens):
         converted.append(parameter[0][0])
 
     if converted:
-        converted = {"actual-parameters": converted}
+        return {"actual-parameters": converted}
     else:
-        converted = None
-
-    return converted
+        return None
 
 
 def convert_parameter_list(_s, _l, tokens):
@@ -518,7 +518,7 @@ def convert_boolean_type(_s, _l, _tokens):
 def convert_type(tokens, parameters):
     converted_type, constraints = tokens
 
-    restricted_to = []
+    restricted_to: list[Any] = []
 
     for constraint_tokens in constraints:
         if isinstance(constraint_tokens, ParseResults):
@@ -594,6 +594,8 @@ def convert_bit_string_value(tokens):
 
 
 def convert_value(tokens, type_=None):
+    value: Any
+
     if type_ == "INTEGER":
         value = int(tokens[0])
     elif type_ == "OBJECT IDENTIFIER":
@@ -707,7 +709,7 @@ def convert_parameterized_value_assignment(_s, _l, tokens):
 
 def convert_imports(_s, _l, tokens):
     tokens = tokens.asList()
-    imports = {}
+    imports: dict[str, Any] = {}
 
     if tokens:
         for from_tokens in tokens:
@@ -907,16 +909,20 @@ def create_grammar():
     constraint = Forward()
     element_set_spec = Forward()
     token_or_group_spec = Forward()
-    value_reference = Forward().setName("valuereference")
-    type_reference = Forward().setName("typereference")
-    value_set = Forward().setName('"valueSet" not implemented')
+    value_reference = Forward()
+    value_reference.setName("valuereference")
+    type_reference = Forward()
+    type_reference.setName("typereference")
+    value_set = Forward()
+    value_set.setName('"valueSet" not implemented')
     named_type = Forward()
     root_element_set_spec = Forward()
     defined_object_set = Forward()
     syntax_list = Forward()
     object_from_object = Forward()
     object_set_from_objects = Forward()
-    defined_value = Forward().setName("DefinedValue")
+    defined_value = Forward()
+    defined_value.setName("DefinedValue")
     component_type_lists = Forward()
     extension_and_exception = Forward()
     optional_extension_marker = Forward()
@@ -935,8 +941,10 @@ def create_grammar():
     sequence_value = Forward()
     signed_number = Forward()
     name_and_number_form = Forward()
-    number_form = Forward().setName("numberForm")
-    definitive_number_form = Forward().setName("definitiveNumberForm")
+    number_form = Forward()
+    number_form.setName("numberForm")
+    definitive_number_form = Forward()
+    definitive_number_form.setName("definitiveNumberForm")
     version_number = Forward()
     union_mark = Forward()
     named_number = Forward()

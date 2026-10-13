@@ -5,6 +5,7 @@ import datetime
 import math
 import time
 from copy import copy
+import typing
 
 from asn1tools_ext.codecs.codec import Codec
 
@@ -349,18 +350,18 @@ def encode_real(data):
         lowest_set_bit = compiler.lowest_set_bit(mantissa)
         mantissa >>= lowest_set_bit
         mantissa |= 0x80 << (8 * ((mantissa.bit_length() // 8) + 1))
-        mantissa = binascii.unhexlify(hex(mantissa)[4:].rstrip("L"))
+        encoded_mantissa = binascii.unhexlify(hex(mantissa)[4:].rstrip("L"))
         exponent = 52 - lowest_set_bit - exponent
 
         if -129 < exponent < 128:
-            exponent = [0x80 | negative_bit, ((0xFF - exponent) & 0xFF)]
+            encoded_exponent = [0x80 | negative_bit, ((0xFF - exponent) & 0xFF)]
         elif -32769 < exponent < 32768:
             exponent = (0xFFFF - exponent) & 0xFFFF
-            exponent = [0x81 | negative_bit, (exponent >> 8), exponent & 0xFF]
+            encoded_exponent = [0x81 | negative_bit, (exponent >> 8), exponent & 0xFF]
         else:
             raise NotImplementedError("REAL exponent {} out of range.".format(exponent))
 
-        data = bytearray(exponent) + mantissa
+        data = bytearray(encoded_exponent) + encoded_mantissa
 
     return data
 
@@ -490,8 +491,8 @@ class Type(BaseType):
         """
         super().__init__(name, type_name)
         if number is None:
-            self.tag = None
-            self.tag_len = None
+            self.tag: typing.Any = None
+            self.tag_len: typing.Any = None
         else:
             self.tag = encode_tag(number, flags)
             self.tag_len = len(self.tag)
@@ -537,6 +538,8 @@ class StandardDecodeMixin(object):
     (single predefined tag to be matched against, then decode length and contents)
     """
 
+    tag: typing.Any
+    tag_len: typing.Any
     indefinite_allowed = (
         False  # Whether indefinite length encoding is allowed for this type
     )
@@ -591,6 +594,8 @@ class StandardEncodeMixin(object):
     """
     Type class mixin for standard encoding logic (append tag + length(content) + content)
     """
+
+    tag: typing.Any
 
     def encode(self, data, encoded, values=None):
         """
@@ -768,7 +773,7 @@ class MembersType(StandardEncodeMixin, StandardDecodeMixin, Type):
     def decode_content(self, data, offset, length):
         end_offset = None if length is None else offset + length
 
-        values = {}
+        values: dict[str, typing.Any] = {}
 
         offset, out_of_data = self.decode_members(
             self.root_members, data, values, offset, end_offset
@@ -975,7 +980,7 @@ class Null(StandardDecodeMixin, Type):
     def is_default(self, value):
         return False
 
-    def encode(self, _, encoded):
+    def encode(self, _, encoded, values=None):
         encoded.extend(self.tag)
         encoded.append(0)
 
@@ -1367,7 +1372,7 @@ class Any(Type):
     def __init__(self, name):
         super(Any, self).__init__(name, "ANY", None)
 
-    def encode(self, data, encoded):
+    def encode(self, data, encoded, values=None):
         encoded.extend(data)
 
     def decode(self, data, offset, values=None):
@@ -1385,7 +1390,7 @@ class AnyDefinedBy(Type):
         self.type_member = type_member
         self.choices = choices
 
-    def encode(self, data, encoded, values):
+    def encode(self, data, encoded, values=None):
         if self.choices:
             try:
                 self.choices[values[self.type_member]].encode(data, encoded)
@@ -1396,7 +1401,7 @@ class AnyDefinedBy(Type):
         else:
             encoded.extend(data)
 
-    def decode(self, data, offset, values):
+    def decode(self, data, offset, values=None):
         """
 
         :param data:
@@ -1472,7 +1477,7 @@ class Recursive(compiler.Recursive, Type):
         self.module_name = module_name
         self.tag_number = None
         self.tag_flags = None
-        self.inner = None
+        self.inner: typing.Any = None
         self.choice_parents = []
 
     def set_tag(self, number, flags):
@@ -1542,6 +1547,7 @@ class Compiler(compiler.Compiler):
     def compile_implicit_type(self, name, type_descriptor, module_name):
         type_name = type_descriptor["type"]
 
+        compiled: Type
         if type_name == "SEQUENCE":
             compiled = Sequence(
                 name, *self.compile_members(type_descriptor["members"], module_name)
@@ -1671,9 +1677,9 @@ class Compiler(compiler.Compiler):
         return compiled
 
     def compile_members(self, members, module_name, sort_by_tag=False):
-        compiled_members = []
+        compiled_members: list[typing.Any] = []
         in_extension = False
-        additions = None
+        additions: list[typing.Any] | None = None
 
         for member in members:
             if member == EXTENSION_MARKER:

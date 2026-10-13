@@ -5,6 +5,7 @@ import datetime
 import json
 import math
 import time
+import typing
 
 from asn1tools_ext.codecs.codec import Codec
 
@@ -173,7 +174,7 @@ class BitString(Type):
             self.size = None
 
     def encode(self, data):
-        value = format_bytes(data[0]).upper()
+        value: typing.Any = format_bytes(data[0]).upper()
 
         if self.size is None:
             value = {"value": value, "length": data[1]}
@@ -460,7 +461,7 @@ class Recursive(compiler.Recursive, Type):
         super(Recursive, self).__init__(name, "RECURSIVE")
         self.type_name = type_name
         self.module_name = module_name
-        self._inner = None
+        self._inner: typing.Any = None
 
     def set_inner_type(self, inner):
         self._inner = inner
@@ -507,6 +508,7 @@ class Compiler(compiler.Compiler):
         module_name = self.get_module_name(type_descriptor, module_name)
         type_name = type_descriptor["type"]
 
+        compiled: Type
         if type_name == "SEQUENCE":
             members, _ = self.compile_members(type_descriptor["members"], module_name)
             compiled = Sequence(name, members)

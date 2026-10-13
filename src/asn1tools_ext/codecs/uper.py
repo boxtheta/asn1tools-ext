@@ -474,6 +474,7 @@ class Compiler(per.Compiler):
         module_name = self.get_module_name(type_descriptor, module_name)
         type_name = type_descriptor["type"]
 
+        compiled: per.Type
         if type_name == "SEQUENCE":
             compiled = Sequence(
                 name, *self.compile_members(type_descriptor["members"], module_name)
