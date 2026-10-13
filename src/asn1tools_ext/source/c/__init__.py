@@ -1,9 +1,13 @@
 import time
+from typing import TYPE_CHECKING
 
 from ...version import __version__
 from . import oer
 from . import uper
 from .utils import camel_to_snake_case
+
+if TYPE_CHECKING:
+    from ...compiler import Specification
 
 
 HEADER_FMT = """\
@@ -323,8 +327,13 @@ static void test_{name}(
 
 
 def _generate_fuzzer_source(
-    namespace, compiled, date, header_name, source_name, fuzzer_source_name
-):
+    namespace: str,
+    compiled: "Specification",
+    date: str,
+    header_name: str,
+    source_name: str,
+    fuzzer_source_name: str,
+) -> tuple[str, str]:
     tests = []
     calls = []
 
@@ -360,7 +369,14 @@ def _generate_fuzzer_source(
     return source, makefile
 
 
-def generate(compiled, codec, namespace, header_name, source_name, fuzzer_source_name):
+def generate(
+    compiled: "Specification",
+    codec: str,
+    namespace: str,
+    header_name: str,
+    source_name: str,
+    fuzzer_source_name: str,
+) -> tuple[str, str, str, str]:
     """Generate C source code from given compiled specification.
 
     `namespace` is used as a prefix for all defines, data structures

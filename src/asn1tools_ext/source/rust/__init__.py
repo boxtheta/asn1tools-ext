@@ -1,7 +1,11 @@
 import time
+from typing import TYPE_CHECKING
 
 from ...version import __version__
 from . import uper
+
+if TYPE_CHECKING:
+    from ...compiler import Specification
 
 
 SOURCE_FMT = """\
@@ -12,7 +16,7 @@ SOURCE_FMT = """\
 """
 
 
-def generate(compiled, codec):
+def generate(compiled: "Specification", codec: str) -> str:
     """Generate Rust source code from given compiled specification."""
 
     date = time.ctime()
