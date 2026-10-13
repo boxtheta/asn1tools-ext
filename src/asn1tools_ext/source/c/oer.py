@@ -56,8 +56,7 @@ def add_encoded_lengths(lengths):
         if isinstance(length_part, int):
             length += length_part
         else:
-            length = None
-            break
+            return None
 
     return length
 
@@ -1129,7 +1128,7 @@ class _Generator(Generator):
         return isinstance(type_, oer.OctetString)
 
     def generate_helpers(self, definitions):
-        helpers = []
+        helpers: list[str] = []
 
         for pattern, definition in functions:
             is_in_helpers = any([pattern in helper for helper in helpers])

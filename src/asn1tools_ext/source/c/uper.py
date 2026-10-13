@@ -622,7 +622,7 @@ class _Generator(Generator):
         return isinstance(type_, uper.OctetString)
 
     def generate_helpers(self, definitions):
-        helpers = []
+        helpers: list[str] = []
 
         for pattern, definition in functions:
             is_in_helpers = any([pattern in helper for helper in helpers])

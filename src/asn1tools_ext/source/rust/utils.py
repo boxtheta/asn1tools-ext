@@ -1,4 +1,5 @@
 import re
+from typing import Any
 
 from ...errors import Error
 
@@ -504,10 +505,10 @@ class Generator(object):
         for user_type in user_types:
             types_code.append(user_type.type_code)
 
-        types_code = "\n".join(types_code)
-        helpers = "\n".join(self.generate_helpers(types_code))
+        joined_types_code = "\n".join(types_code)
+        helpers = "\n".join(self.generate_helpers(joined_types_code))
 
-        return helpers, types_code
+        return helpers, joined_types_code
 
     def format_type(self, type_, checker):
         raise NotImplementedError("To be implemented by subclasses.")
@@ -568,7 +569,7 @@ def strip_blank_lines(lines):
     except IndexError:
         pass
 
-    stripped = []
+    stripped: list[str] = []
 
     for line in lines:
         if line == "" and stripped[-1] == "":
@@ -598,7 +599,7 @@ def dedent_lines(lines, width=4):
 
 
 def sort_user_types_by_used_user_types(user_types):
-    reversed_sorted_user_types = []
+    reversed_sorted_user_types: list[Any] = []
 
     for user_type in user_types:
         user_type_name_tuple = (user_type.type_name, user_type.module_name)

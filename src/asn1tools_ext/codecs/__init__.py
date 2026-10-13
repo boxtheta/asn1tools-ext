@@ -14,7 +14,7 @@ class BaseType(object):
     Base Type class containing common functionality between all codecs
     """
 
-    def __init__(self, name: str | None, type_name: str) -> None:
+    def __init__(self, name: str, type_name: str) -> None:
         self.name = name
         self.type_name = type_name
         self.optional = False

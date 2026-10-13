@@ -5,6 +5,7 @@ import datetime
 import math
 import time
 from copy import copy
+import typing
 
 from asn1tools_ext.codecs.codec import Codec
 
@@ -63,9 +64,7 @@ class MembersType(Type):
                     )
                 )
 
-        encoded_members = ",".join(encoded_members)
-
-        return separator.join(["{" + encoded_members, "}"])
+        return separator.join(["{" + ",".join(encoded_members), "}"])
 
     def __repr__(self):
         return "{}({}, [{}])".format(
@@ -89,9 +88,7 @@ class ArrayType(Type):
             encoded_element = "{}{}".format(element_separator, encoded_element)
             encoded_elements.append(encoded_element)
 
-        encoded_elements = ",".join(encoded_elements)
-
-        return separator.join(["{" + encoded_elements, "}"])
+        return separator.join(["{" + ",".join(encoded_elements), "}"])
 
     def __repr__(self):
         return "{}({}, {})".format(
@@ -372,7 +369,7 @@ class Recursive(compiler.Recursive, Type):
         super(Recursive, self).__init__(name, "RECURSIVE")
         self.type_name = type_name
         self.module_name = module_name
-        self.inner = None
+        self.inner: typing.Any = None
 
     def set_inner_type(self, inner):
         self.inner = copy(inner)
@@ -418,6 +415,7 @@ class Compiler(compiler.Compiler):
         module_name = self.get_module_name(type_descriptor, module_name)
         type_name = type_descriptor["type"]
 
+        compiled: Type
         if type_name == "SEQUENCE":
             members, _ = self.compile_members(type_descriptor["members"], module_name)
             compiled = Sequence(name, members)

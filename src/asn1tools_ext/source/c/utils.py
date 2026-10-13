@@ -1,5 +1,6 @@
 import re
 from operator import itemgetter
+from typing import Any
 
 from ...errors import Error
 
@@ -745,12 +746,15 @@ class Generator(object):
             definitions_inner.append(user_type.definition_inner)
             definitions.append(user_type.definition)
 
-        type_declarations = "\n".join(type_declarations)
-        declarations = "\n".join(declarations)
-        definitions = "\n".join(definitions_inner + definitions)
-        helpers = "\n".join(self.generate_helpers(definitions))
+        definitions_code = "\n".join(definitions_inner + definitions)
+        helpers = "\n".join(self.generate_helpers(definitions_code))
 
-        return type_declarations, declarations, helpers, definitions
+        return (
+            "\n".join(type_declarations),
+            "\n".join(declarations),
+            helpers,
+            definitions_code,
+        )
 
     def format_default(self, type_):
         raise NotImplementedError("To be implemented by subclasses.")
@@ -816,7 +820,7 @@ def strip_blank_lines(lines):
     except IndexError:
         pass
 
-    stripped = []
+    stripped: list[str] = []
 
     for line in lines:
         if line == "" and stripped[-1] == "":
@@ -864,7 +868,7 @@ def topological_sort(graph):
 
         return path
 
-    path = []
+    path: list[Any] = []
 
     for node in sorted(graph):
         path = recurse(node, path)

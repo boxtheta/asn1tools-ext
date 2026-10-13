@@ -3,6 +3,7 @@
 import sys
 import datetime
 from copy import copy
+from typing import Any
 
 from . import EncodeError, ErrorWithLocation
 from . import compiler
@@ -265,7 +266,7 @@ class Recursive(compiler.Recursive, Type):
         super(Recursive, self).__init__(name)
         self.type_name = type_name
         self.module_name = module_name
-        self.inner = None
+        self.inner: Any = None
 
     def set_inner_type(self, inner):
         self.inner = copy(inner)
@@ -299,6 +300,7 @@ class Compiler(compiler.Compiler):
         module_name = type_descriptor.get("module-name", module_name)
         type_name = type_descriptor["type"]
 
+        compiled: Type
         if type_name in ["SEQUENCE", "SET"]:
             members, _ = self.compile_members(type_descriptor["members"], module_name)
             compiled = Dict(name, members)

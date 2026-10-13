@@ -264,6 +264,7 @@ class Compiler(ber.Compiler):
     def compile_implicit_type(self, name, type_descriptor, module_name):
         type_name = type_descriptor["type"]
 
+        compiled: ber.Type
         if type_name == "SEQUENCE":
             compiled = Sequence(
                 name, *self.compile_members(type_descriptor["members"], module_name)

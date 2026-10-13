@@ -4,6 +4,7 @@ import binascii
 import sys
 from copy import copy, deepcopy
 from operator import attrgetter
+from typing import Any
 
 import bitstruct
 
@@ -81,8 +82,8 @@ def clean_bit_string_value(value, has_named_bits):
 
 class CompiledType(object):
     def __init__(self, type_):
-        self.constraints_checker = None
-        self.type_checker = None
+        self.constraints_checker: Any = None
+        self.type_checker: Any = None
         self._type = type_
 
     @property
@@ -116,6 +117,8 @@ class Recursive(object):
     """
     Mixin used to identify Recursive types
     """
+
+    type_name: str
 
     def __repr__(self):
         return "{}({})".format(type(self).__name__, self.type_name)
@@ -183,7 +186,7 @@ class Compiler(object):
         self._types_backtrace = []
         self.recursive_types = []
         self.compiled = {}
-        self.current_type_descriptor = None
+        self.current_type_descriptor: Any = None
 
     def types_backtrace_push(self, type_name):
         self._types_backtrace.append(type_name)
@@ -198,7 +201,7 @@ class Compiler(object):
     def process(self):
         self.pre_process()
 
-        compiled = {}
+        compiled: dict[str, Any] = {}
 
         for module_name in self._specification:
             items = self._specification[module_name]["types"].items()
@@ -458,11 +461,11 @@ class Compiler(object):
             number_of_bits = len(default) - 2
 
         if number_of_bits > 0:
-            mask = bitstruct.pack("u{}".format(number_of_bits), mask)
+            encoded_mask = bitstruct.pack("u{}".format(number_of_bits), mask)
         else:
-            mask = b""
+            encoded_mask = b""
 
-        member["default"] = (mask, number_of_bits)
+        member["default"] = (encoded_mask, number_of_bits)
 
     def pre_process_default_value_octet_string(self, member):
         default = member["default"]
@@ -738,7 +741,7 @@ class Compiler(object):
 
         """
 
-        compiled = None
+        compiled: OpenTypeSequence | OpenTypeSequenceOf | None = None
         type_name = type_descriptor["type"]
 
         if type_name in ["SEQUENCE", "SET"]:
@@ -849,7 +852,7 @@ class Compiler(object):
 
         return compiled_member
 
-    def get_size_range(self, type_descriptor, module_name):
+    def get_size_range(self, type_descriptor, module_name) -> tuple[Any, Any, Any]:
         """Returns a tuple of the minimum and maximum values allowed according
         the the ASN.1 specification SIZE parameter. Returns (None,
         None, None) if the type does not have a SIZE parameter.
