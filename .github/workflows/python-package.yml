@@ -72,6 +72,10 @@ jobs:
     needs: [test-python, typecheck, test-python-sdist, examples]
     runs-on: ubuntu-latest
     if: startsWith(github.ref, 'refs/tags')
+    permissions:
+      # Required for PyPI trusted publishing.
+      id-token: write
+      contents: read
 
     steps:
     - uses: actions/checkout@v4
@@ -84,4 +88,3 @@ jobs:
       uses: pypa/gh-action-pypi-publish@release/v1
       with:
         skip-existing: true
-        password: ${{ secrets.pypi_password }}
