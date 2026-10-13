@@ -48,6 +48,9 @@ jobs:
     - name: Test
       run: |
         uv run make test-sdist
+    - name: Check the package description
+      run: |
+        uvx twine check --strict dist/*.tar.gz
 
   examples:
 
