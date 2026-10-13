@@ -25,7 +25,7 @@ TODOs:
 =======
 
 - Improve the `C` generator and add other supported languages and preferably
-a plugin system to allow for easy addition of target languages.
+  a plugin system to allow for easy addition of target languages.
 
 Project homepage: https://github.com/boxtheta/asn1tools-ext
 
