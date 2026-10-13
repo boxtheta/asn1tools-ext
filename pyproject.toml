@@ -1,6 +1,6 @@
 [project]
 name = "asn1tools_ext"
-version = "0.2.2"
+version = "1.0.0"
 description = "ASN.1 parser, compiler and general swiss army knife"
 readme = "README.rst"
 authors = [
@@ -14,14 +14,14 @@ dependencies = [
 license = "MIT"
 license-files = ["LICENSE"]
 classifiers = [
-    "Development Status :: 4 - Beta",
+    "Development Status :: 5 - Production/Stable",
     "Intended Audience :: Developers",
     "Programming Language :: Python :: 3",
     "Topic :: Software Development :: Libraries :: Python Modules",
 ]
 
 [project.urls]
-source = "https://github.com/xadaemon/asn1tools-ext"
+source = "https://github.com/boxtheta/asn1tools-ext"
 
 [build-system]
 requires = ["uv_build>=0.9.10,<0.13.0"]
