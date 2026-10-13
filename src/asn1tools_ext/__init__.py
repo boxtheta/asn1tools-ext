@@ -10,3 +10,27 @@ from .source import c, rust
 from .version import __version__
 
 __author__ = "BoxTheta"
+
+__all__ = [
+    "CompileError",
+    "ConstraintsError",
+    "DecodeError",
+    "EncodeError",
+    "Error",
+    "ParseError",
+    "c",
+    "codecs",
+    "compile_dict",
+    "compile_files",
+    "compile_string",
+    "compiler",
+    "errors",
+    "parse_files",
+    "parse_string",
+    "parser",
+    "pre_process_dict",
+    "rust",
+    "source",
+    "version",
+    "__version__",
+]
